@@ -1,0 +1,17 @@
+name: ${project.name}
+main: com.github.maxopoly.MemeMana.MemeManaPlugin
+author: Maxopoly
+version: ${project.version}
+depend: [CivModCore, Donum]
+commands:
+    fm:
+        permission: fm.public
+    fmc:
+        permission: fm.op
+    fmsrc:
+        permission: fm.op
+permissions:
+    fm.public:
+        default: true
+    fm.op:
+        default: op

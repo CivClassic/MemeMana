@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		<modelVersion>4.0.0</modelVersion>
+
+		<groupId>com.github.maxopoly</groupId>
+		<artifactId>MemeMana</artifactId>
+		<version>1.0</version>
+		<packaging>jar</packaging>
+
+		<name>MemeMana</name>
+		<url>https://github.com/CivClassic/MemeMana</url>
+
+		<properties>
+				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+				<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+				<maven.compiler.source>1.8</maven.compiler.source>
+				<maven.compiler.target>1.8</maven.compiler.target>
+		</properties>
+
+		<dependencies>
+				<dependency>
+						<groupId>vg.civcraft.mc.civmodcore</groupId>
+						<artifactId>CivModCore</artifactId>
+						<version>1.6.1</version>
+						<scope>provided</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.spigotmc</groupId>
+						<artifactId>spigot-api</artifactId>
+						<version>1.12-R0.1-SNAPSHOT</version>
+						<scope>provided</scope>
+				</dependency>
+				<dependency>
+						<groupId>com.civclassic.altmanager</groupId>
+						<artifactId>AltManager</artifactId>
+						<version>2.6.4</version>
+						<scope>provided</scope>
+				</dependency>
+		</dependencies>
+
+		<repositories>
+				<repository>
+						<id>devoted-repo</id>
+						<url>https://build.devotedmc.com/plugin/repository/everything/</url>
+				</repository>
+				<repository>
+						<id>spigot-repo</id>
+						<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+				</repository>
+								<repository>
+						<id>devoted-repo</id>
+						<url>http://dydoisbutts.info:8080/plugin/repository/everything/</url>
+				</repository>
+		</repositories>
+</project>
