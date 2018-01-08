@@ -15,7 +15,7 @@ public class MemeManaUnit {
 		this.gainTime = gainTime;
 	}
 
-	public MemeManaUnit(int id, int originalAmount) {
+	public MemeManaUnit(int id, double originalAmount) {
 		this(id, originalAmount, System.currentTimeMillis(), 1.0f);
 	}
 

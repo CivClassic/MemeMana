@@ -28,6 +28,11 @@ public class MemeManaPouch {
 		}
 	}
 
+	public void addNewUnit(int id, double amount) {
+		// TODO mirror in db
+		units.add(new MemeManaUnit(id, amount));
+	}
+
 	/**
 	 * @return How much mana is currently in this pouch
 	 */

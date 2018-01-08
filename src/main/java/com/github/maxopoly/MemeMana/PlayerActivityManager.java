@@ -7,17 +7,27 @@ import java.util.UUID;
 public class PlayerActivityManager {
 
 	private Map<UUID, ManaGainStat> stats;
+	private MemeManaManager manaManager;
+
+	public PlayerActivityManager(MemeManaManager manaManager) {
+		this.manaManager = manaManager;
+		reloadFromDB();
+	}
+
+	public void reloadFromDB() {
+		// TODO
+	}
 
 	public void updatePlayer(UUID player) {
 		// TODO altmanager integration
 		ManaGainStat stat = stats.get(player);
 		if (stat.update()) {
-			giveOutReward(stat.getStreak());
+			giveOutReward(player, stat.getStreak());
 		}
 	}
 
-	public void giveOutReward(int amount) {
-		// TODO
+	public void giveOutReward(UUID player, int amount) {
+		MemeManaPlugin.getInstance().getManaManager().getPouch(player).addNewUnit(manaManager.getNextManaID(), amount);
+		// TODO send message to player?
 	}
-
 }

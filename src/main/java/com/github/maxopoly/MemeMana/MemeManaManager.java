@@ -8,6 +8,7 @@ import java.util.UUID;
 public class MemeManaManager {
 
 	private Map<UUID, MemeManaPouch> playerPouches;
+	private int manaCounter;
 
 	public MemeManaManager() {
 		playerPouches = new HashMap<UUID, MemeManaPouch>();
@@ -21,6 +22,10 @@ public class MemeManaManager {
 	public MemeManaPouch getPouch(UUID player) {
 		// TODO altmanager stuff
 		return playerPouches.get(player);
+	}
+
+	public int getNextManaID() {
+		return ++manaCounter;
 	}
 
 }
