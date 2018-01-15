@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public class MemeManaManager {
 
+	// Maps a single player in an alt-group to their MemeManaPouch
 	private Map<UUID, MemeManaPouch> playerPouches;
 	private int manaCounter;
 
@@ -20,8 +21,7 @@ public class MemeManaManager {
 	}
 
 	public MemeManaPouch getPouch(UUID player) {
-		// TODO altmanager stuff
-		return playerPouches.get(player);
+		return playerPouches.get(MemeManaIdentity.selectAlt(playerPouches.keySet(),player));
 	}
 
 	public int getNextManaID() {

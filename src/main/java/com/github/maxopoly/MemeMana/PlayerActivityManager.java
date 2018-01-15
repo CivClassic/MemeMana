@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class PlayerActivityManager {
 
+	// Maps a single player in an alt-group to their ManaGainStat
 	private Map<UUID, ManaGainStat> stats;
 	private MemeManaManager manaManager;
 
@@ -19,10 +20,9 @@ public class PlayerActivityManager {
 	}
 
 	public void updatePlayer(UUID player) {
-		// TODO altmanager integration
-		ManaGainStat stat = stats.get(player);
-		if (stat.update()) {
-			giveOutReward(player, stat.getStreak());
+		ManaGainStat relevantAlt = stats.get(MemeManaIdentity.selectAlt(stats.keySet(),player));
+		if(relevantAlt.update()) {
+			giveOutReward(player,relevantAlt.getStreak());
 		}
 	}
 
