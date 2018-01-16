@@ -5,23 +5,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.programmerdan.minecraft.banstick.data.BSPlayer;
+
 public class MemeManaManager {
 
-	// Maps a single player in an alt-group to their MemeManaPouch
-	private Map<UUID, MemeManaPouch> playerPouches;
+	private Map<Long, MemeManaPouch> playerPouches;
 	private int manaCounter;
 
 	public MemeManaManager() {
-		playerPouches = new HashMap<UUID, MemeManaPouch>();
+		playerPouches = new HashMap<Long, MemeManaPouch>();
 		reloadFromDatabase();
 	}
 
 	private void reloadFromDatabase() {
-
+		this.playerPouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
 	}
 
 	public MemeManaPouch getPouch(UUID player) {
-		return playerPouches.get(MemeManaIdentity.selectAlt(playerPouches.keySet(),player));
+		return playerPouches.get(new MemeManaIdentity(player).selectAlt(playerPouches.keySet()));
 	}
 
 	public int getNextManaID() {

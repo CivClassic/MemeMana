@@ -8,6 +8,10 @@ public class MemeManaPouch {
 
 	// chronologically ordered!
 	private List<MemeManaUnit> units;
+	
+	public MemeManaPouch(List<MemeManaUnit> units) {
+		this.units = units;
+	}
 
 	/**
 	 * Removes mana past the maximum keep time
@@ -31,6 +35,10 @@ public class MemeManaPouch {
 	public void addNewUnit(int id, double amount) {
 		// TODO mirror in db
 		units.add(new MemeManaUnit(id, amount));
+	}
+
+	public List<MemeManaUnit> getUnits() {
+		return units;
 	}
 
 	/**

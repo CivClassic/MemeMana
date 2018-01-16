@@ -4,10 +4,11 @@ import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import java.util.Map;
 import java.util.UUID;
 
+import com.programmerdan.minecraft.banstick.data.BSPlayer;
+
 public class PlayerActivityManager {
 
-	// Maps a single player in an alt-group to their ManaGainStat
-	private Map<UUID, ManaGainStat> stats;
+	private Map<Long, ManaGainStat> stats;
 	private MemeManaManager manaManager;
 
 	public PlayerActivityManager(MemeManaManager manaManager) {
@@ -16,11 +17,22 @@ public class PlayerActivityManager {
 	}
 
 	public void reloadFromDB() {
-		// TODO
+		this.stats = MemeManaPlugin.getInstance().getDAO().getManaStats();
+	}
+
+	private ManaGainStat getForPlayer(UUID player) {
+		MemeManaIdentity ident = new MemeManaIdentity(player);
+		ManaGainStat stat = stats.get(ident.selectAlt(stats.keySet()));
+		if(stat == null) {
+			stat = new ManaGainStat(0,0);
+			stats.put(ident.getID(),stat);
+			MemeManaPlugin.getInstance().getDAO().addManaStat(ident,stat);
+		}
+		return stat;
 	}
 
 	public void updatePlayer(UUID player) {
-		ManaGainStat relevantAlt = stats.get(MemeManaIdentity.selectAlt(stats.keySet(),player));
+		ManaGainStat relevantAlt = getForPlayer(player);
 		if(relevantAlt.update()) {
 			giveOutReward(player,relevantAlt.getStreak());
 		}
