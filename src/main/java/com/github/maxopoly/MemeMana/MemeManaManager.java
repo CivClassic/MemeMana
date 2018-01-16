@@ -29,4 +29,12 @@ public class MemeManaManager {
 		return ++manaCounter;
 	}
 
+	//TODO
+  // Must keep decay times correct
+  // true means successful
+	public boolean transferMana(UUID from, UUID to, double amount) {
+		MemeManaPouch fromPouch = getPouch(from);
+		MemeManaPouch toPouch = getPouch(to);
+		return false;
+	}
 }

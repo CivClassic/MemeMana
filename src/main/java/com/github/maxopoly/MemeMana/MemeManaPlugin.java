@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.listener.LoginListener;
+import com.github.maxopoly.MemeMana.command.MemeManaCommandHandler;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 public class MemeManaPlugin extends ACivMod {
@@ -24,6 +25,10 @@ public class MemeManaPlugin extends ACivMod {
 		manaManager = new MemeManaManager();
 		activityManager = new PlayerActivityManager(manaManager);
 		registerListener();
+		// Register commands.
+		MemeManaCommandHandler handle = new MemeManaCommandHandler();
+		setCommandHandler(handle);
+		handle.registerCommands();
 	}
 
 	private void registerListener() {
