@@ -22,13 +22,15 @@ public class PlayerActivityManager {
 	}
 
 	private ManaGainStat getForPlayer(MemeManaOwner ident) {
-		ManaGainStat stat = stats.get(ident.selectAlt(stats.keySet()));
-		if(stat == null) {
-			stat = new ManaGainStat(0,0);
+		Long pid = ident.selectAlt(stats.keySet());
+		if(pid != null) {
+			return stats.get(pid);
+		} else {
+			ManaGainStat stat = new ManaGainStat(0,0);
 			stats.put(ident.getID(),stat);
 			MemeManaPlugin.getInstance().getDAO().addManaStat(ident,stat);
+			return stat;
 		}
-		return stat;
 	}
 
 	public void updatePlayer(MemeManaOwner player) {

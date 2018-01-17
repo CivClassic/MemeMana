@@ -30,10 +30,10 @@ public class MemeManaIdentity implements MemeManaOwner {
 		return bsId;
 	}
 
-	public long selectAlt(Set<Long> theSet) {
+	public Long selectAlt(Set<Long> theSet) {
 		Long found = null;
 		for(long u : theSet) {
-			if(this.associatedWith(new MemeManaIdentity(u))) {
+			if(bsId == u || this.associatedWith(new MemeManaIdentity(u))) {
 				if(found == null) {
 					found = u;
 				} else {

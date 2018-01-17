@@ -12,5 +12,6 @@ public interface MemeManaOwner {
 
 	// Select an alt from the given set which is an alt of this owner
 	// while removing all other alts of this owner from the set
-	public long selectAlt(Set<Long> theSet);
+	// Returning null indicates no alt was found, so you should make a new entry
+	public Long selectAlt(Set<Long> theSet);
 }

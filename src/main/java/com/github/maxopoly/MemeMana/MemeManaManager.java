@@ -7,12 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.programmerdan.minecraft.banstick.data.BSPlayer;
-
 public class MemeManaManager {
 
 	private Map<Long, MemeManaPouch> playerPouches;
-	private int manaCounter;
+	private int nextManaId;
 
 	public MemeManaManager() {
 		playerPouches = new HashMap<Long, MemeManaPouch>();
@@ -21,14 +19,27 @@ public class MemeManaManager {
 
 	private void reloadFromDatabase() {
 		this.playerPouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
+		nextManaId = 0;
+		playerPouches.forEach((k,v) -> {
+			for(MemeManaUnit u : v.getUnits()) {
+				if(u.getID() >= nextManaId) {nextManaId = u.getID() + 1;}
+			}
+		});
 	}
 
 	public MemeManaPouch getPouch(MemeManaOwner player) {
-		return playerPouches.get(player.selectAlt(playerPouches.keySet()));
+		Long pid = player.selectAlt(playerPouches.keySet());
+		if(pid != null) {
+			return playerPouches.get(pid);
+		} else {
+			MemeManaPouch pouch = new MemeManaPouch();
+			playerPouches.put(player.getID(),pouch);
+			return pouch;
+		}
 	}
 
 	public int getNextManaID() {
-		return ++manaCounter;
+		return nextManaId++;
 	}
 
 	//TODO

@@ -11,8 +11,10 @@ public class MemeManaUnit {
 	private double fillGrade;
 
 	public MemeManaUnit(int id, double originalAmount, long gainTime, double fillGrade) {
+		this.id = id;
 		this.originalAmount = originalAmount;
 		this.gainTime = gainTime;
+		this.fillGrade = fillGrade;
 	}
 
 	public MemeManaUnit(int id, double originalAmount) {

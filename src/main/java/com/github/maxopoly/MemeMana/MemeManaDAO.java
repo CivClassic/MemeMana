@@ -36,8 +36,8 @@ public class MemeManaDAO extends ManagedDatasource {
 		registerMigration(
 				0,
 				false,
-				"CREATE TABLE IF NOT EXISTS manaUnits (id int not null, baseAmount double not null, fillGrade float not null default 1.0,"
-						+ "date datetime NOT NULL default NOW(), ownerId BIGINT NOT NULL, unique (id), index `ownerIdIndex` (owner_id));",
+				"CREATE TABLE IF NOT EXISTS manaUnits (id int not null, baseAmount double not null, fillGrade double not null default 1.0,"
+						+ "date datetime NOT NULL default NOW(), ownerId BIGINT NOT NULL, unique (id), index `ownerIdIndex` (ownerId));",
 				"create table if not exists manaStats (id BIGINT not null, streak int not null, lastDay BIGINT not null, primary key(id));");
 	}
 

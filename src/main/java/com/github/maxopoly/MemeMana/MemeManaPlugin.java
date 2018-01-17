@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana;
 import com.github.maxopoly.MemeMana.listener.LoginListener;
 import com.github.maxopoly.MemeMana.command.MemeManaCommandHandler;
 import vg.civcraft.mc.civmodcore.ACivMod;
+import org.bukkit.configuration.ConfigurationSection;
 
 public class MemeManaPlugin extends ACivMod {
 
@@ -20,8 +21,9 @@ public class MemeManaPlugin extends ACivMod {
 	@Override
 	public void onEnable() {
 		super.onEnable();
+		instance = this;
 		config = new MemeManaConfig(this);
-		// TODO create dao instance
+		setupDatabase();
 		manaManager = new MemeManaManager();
 		activityManager = new PlayerActivityManager(manaManager);
 		registerListener();
@@ -29,6 +31,25 @@ public class MemeManaPlugin extends ACivMod {
 		MemeManaCommandHandler handle = new MemeManaCommandHandler();
 		setCommandHandler(handle);
 		handle.registerCommands();
+	}
+
+	private void setupDatabase() {
+		ConfigurationSection config = getConfig().getConfigurationSection("mysql");
+		String host = config.getString("host");
+		int port = config.getInt("port");
+		String user = config.getString("user");
+		String pass = config.getString("password");
+		String dbname = config.getString("database");
+		int poolsize = config.getInt("poolsize");
+		long connectionTimeout = config.getLong("connectionTimeout");
+		long idleTimeout = config.getLong("idleTimeout");
+		long maxLifetime = config.getLong("maxLifetime");
+		try {
+			dao = new MemeManaDAO(this, user, pass, host, port, dbname, poolsize, connectionTimeout, idleTimeout, maxLifetime);
+		} catch(Exception e) {
+			warning("Could not connect to database, stopping MemeMana", e);
+			getServer().getPluginManager().disablePlugin(this);
+		}
 	}
 
 	private void registerListener() {

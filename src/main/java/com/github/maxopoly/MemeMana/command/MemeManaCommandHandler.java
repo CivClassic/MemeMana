@@ -5,6 +5,6 @@ public class MemeManaCommandHandler extends CommandHandler{
 
 	@Override
 	public void registerCommands() {
-		addCommands(new CmdMana("Mana"));
+		addCommands(new CmdMana("CmdMana"));
 	}
 }

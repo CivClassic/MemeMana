@@ -41,7 +41,7 @@ public class CmdMana extends PlayerCommand {
 		}
 		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaIdentity.fromPlayer((Player)sender));
 		int manaAvailable = pouch.getContent();
-		msg("<i>You have<g> %s<i> mana",manaAvailable);
+		msg("<i>You have<g> %d<i> mana",manaAvailable);
 	}
 
 	public void doRefill(CommandSender sender, String[] args) {

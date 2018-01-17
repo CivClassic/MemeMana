@@ -1,0 +1,10 @@
+mysql:
+  user: 'root'
+  password: 'asdfasdf'
+  host: localhost
+  database: mememana
+  port: 3306
+  poolsize: 10
+  connectionTimeout: 10000
+  idleTimout: 600000
+  maxLifetime: 7200000

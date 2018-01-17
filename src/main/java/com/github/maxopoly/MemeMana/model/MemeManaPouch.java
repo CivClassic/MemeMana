@@ -3,12 +3,17 @@ package com.github.maxopoly.MemeMana.model;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 public class MemeManaPouch {
 
 	// chronologically ordered!
 	private List<MemeManaUnit> units;
-	
+
+	public MemeManaPouch() {
+		this.units = new ArrayList<MemeManaUnit>();
+	}
+
 	public MemeManaPouch(List<MemeManaUnit> units) {
 		this.units = units;
 	}

@@ -2,7 +2,7 @@ name: ${project.name}
 main: com.github.maxopoly.MemeMana.MemeManaPlugin
 author: Maxopoly
 version: ${project.version}
-depend: [CivModCore, Donum]
+depend: [CivModCore, BanStick]
 commands:
     fm:
         permission: fm.public
