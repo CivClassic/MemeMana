@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
+import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,8 +21,7 @@ public class PlayerActivityManager {
 		this.stats = MemeManaPlugin.getInstance().getDAO().getManaStats();
 	}
 
-	private ManaGainStat getForPlayer(UUID player) {
-		MemeManaIdentity ident = new MemeManaIdentity(player);
+	private ManaGainStat getForPlayer(MemeManaOwner ident) {
 		ManaGainStat stat = stats.get(ident.selectAlt(stats.keySet()));
 		if(stat == null) {
 			stat = new ManaGainStat(0,0);
@@ -31,15 +31,15 @@ public class PlayerActivityManager {
 		return stat;
 	}
 
-	public void updatePlayer(UUID player) {
+	public void updatePlayer(MemeManaOwner player) {
 		ManaGainStat relevantAlt = getForPlayer(player);
 		if(relevantAlt.update()) {
 			giveOutReward(player,relevantAlt.getStreak());
 		}
 	}
 
-	public void giveOutReward(UUID player, int amount) {
-		MemeManaPlugin.getInstance().getManaManager().getPouch(player).addNewUnit(manaManager.getNextManaID(), amount);
+	public void giveOutReward(MemeManaOwner player, int amount) {
+		MemeManaPlugin.getInstance().getManaManager().addMana(player,amount);
 		// TODO send message to player?
 	}
 }

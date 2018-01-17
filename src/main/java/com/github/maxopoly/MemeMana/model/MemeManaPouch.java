@@ -32,9 +32,9 @@ public class MemeManaPouch {
 		}
 	}
 
-	public void addNewUnit(int id, double amount) {
+	public void addNewUnit(MemeManaUnit unit) {
 		// TODO mirror in db
-		units.add(new MemeManaUnit(id, amount));
+		units.add(unit);
 	}
 
 	public List<MemeManaUnit> getUnits() {

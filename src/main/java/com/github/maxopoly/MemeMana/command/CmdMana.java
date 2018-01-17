@@ -5,6 +5,8 @@ import vg.civcraft.mc.namelayer.NameAPI;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.model.MemeManaOwner;
+import com.github.maxopoly.MemeMana.MemeManaIdentity;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
@@ -17,26 +19,31 @@ public class CmdMana extends PlayerCommand {
 		super(name);
 		setIdentifier("mana");
 		setDescription("The base command for Meme Mana");
-		setUsage("/mana");
-		setArguments(0, 1);
+		setUsage("\n/mana show -- Show your current mana\n/mana refill [Amount] -- Refill the pearl in your hand by an amount\n/mana transfer <Player> <Amount> -- Transfer some mana to another player");
+		setArguments(1,3);
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		if (args.length == 0 || args[0] == "help") {
-			showHelpText(sender,args);
+		if (args[0] == "show") {
+			showManaAmount(sender);
 		} else if (args[0] == "refill") {
 			doRefill(sender,args);
 		} else if (args[0] == "transfer") {
 			doTransfer(sender,args);
-		} else if (args[0] == "transfer") {
-			doRefill(sender,args);
 		}
 		return true;
 	}
 
-	public void showHelpText(CommandSender sender, String[] args) {
-	//TODO
+	public void showManaAmount(CommandSender sender) {
+		if (!(sender instanceof Player)) {
+			msg("Can't show your own mana from console. Try /mana inspect instead");
+			return;
+		}
+		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaIdentity.fromPlayer((Player)sender));
+		int manaAvailable = pouch.getContent();
+		msg("<i>You have<g> %s<i> mana",manaAvailable);
 	}
+
 	public void doRefill(CommandSender sender, String[] args) {
 		if (!(sender instanceof Player)) {
 			msg("Can't refill from console");
@@ -55,7 +62,7 @@ public class CmdMana extends PlayerCommand {
 			return;
 		}
 		int repairPerUnitMana = 5;
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(player.getUniqueId());
+		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaIdentity.fromPlayer(player));
 		int manaAvailable = pouch.getContent();
 		int manaToUse = Math.min((int)Math.ceil((maxHealth - pearl.getHealth()) / (double)repairPerUnitMana), manaAvailable);
 		if (pouch.deposit(manaToUse)) {
@@ -65,17 +72,16 @@ public class CmdMana extends PlayerCommand {
 
 	public void doTransfer(CommandSender sender, String[] args) {
 		if (!(sender instanceof Player)) {
-			msg("Can't transfer from console");
+			msg("Can't transfer mana from console");
 			return;
 		}
 		Player player = (Player) sender;
 		if (args.length < 2) {
-			msg("Must specify player to transfer to");
+			msg("<b>Usage: <i>/mana transfer <c>Player");
 			return;
 		}
-		UUID toUUID = NameAPI.getUUID(args[1]);
-		if (MemeManaPlugin.getInstance().getManaManager().transferMana(player.getUniqueId(),toUUID,5)) {
-			msg("Transfer worked");
+		if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaIdentity.fromPlayer(player),MemeManaIdentity.fromPlayerName(args[1]),5)) {
+			msg("");
 		}
 	}
 

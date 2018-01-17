@@ -1,6 +1,8 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.model.MemeManaUnit;
+import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -21,8 +23,8 @@ public class MemeManaManager {
 		this.playerPouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
 	}
 
-	public MemeManaPouch getPouch(UUID player) {
-		return playerPouches.get(new MemeManaIdentity(player).selectAlt(playerPouches.keySet()));
+	public MemeManaPouch getPouch(MemeManaOwner player) {
+		return playerPouches.get(player.selectAlt(playerPouches.keySet()));
 	}
 
 	public int getNextManaID() {
@@ -30,11 +32,17 @@ public class MemeManaManager {
 	}
 
 	//TODO
-  // Must keep decay times correct
-  // true means successful
-	public boolean transferMana(UUID from, UUID to, double amount) {
+	// Must keep decay times correct
+	// true means successful
+	public boolean transferMana(MemeManaOwner from, MemeManaOwner to, double amount) {
 		MemeManaPouch fromPouch = getPouch(from);
 		MemeManaPouch toPouch = getPouch(to);
 		return false;
+	}
+
+	public void addMana(MemeManaOwner player, double amount) {
+		MemeManaUnit unit = new MemeManaUnit(getNextManaID(),amount);
+		getPouch(player).addNewUnit(unit);
+		MemeManaPlugin.getInstance().getDAO().addManaUnit(unit,player);
 	}
 }
