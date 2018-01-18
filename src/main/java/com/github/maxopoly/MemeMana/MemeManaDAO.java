@@ -59,14 +59,20 @@ public class MemeManaDAO extends ManagedDatasource {
 	public Map<Long,MemeManaPouch> getManaPouches() {
 		try (Connection connection = getConnection();
 				PreparedStatement getManaPouches = connection
-						.prepareStatement("select * from manaUnits;")) {
-			ResultSet rs = getManaPouches.executeQuery();
+						.prepareStatement("select * from manaUnits order by ownerId, date;");
+				ResultSet rs = getManaPouches.executeQuery();) {
 			Map<Long,MemeManaPouch> out = new HashMap<Long,MemeManaPouch>();
+			MemeManaPouch thisPouch = new MemeManaPouch();
+			long thisOwner = -1;
 			while(rs.next()) {
-				MemeManaUnit unit = new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getDate(4).getTime(),rs.getDouble(3));
-				out.putIfAbsent(rs.getLong(5),new MemeManaPouch(new ArrayList<MemeManaUnit>()));
-				insertChron(unit,out.get(rs.getLong(5)).getUnits());
+				if(thisOwner != rs.getLong(5)) {
+					out.put(thisOwner,thisPouch);
+					thisPouch = new MemeManaPouch();
+					thisOwner = rs.getLong(5);
+				}
+				thisPouch.addNewUnit(new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getDate(4).getTime(),rs.getDouble(3)));
 			}
+			out.put(thisOwner,thisPouch);
 			return out;
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem getting mana pouches", e);
@@ -74,6 +80,18 @@ public class MemeManaDAO extends ManagedDatasource {
 		}
 	}
 
+	public Integer getNextManaId() {
+		try (Connection connection = getConnection();
+				PreparedStatement getNextMana = connection
+						.prepareStatement("select max(id) from manaUnits;");
+				ResultSet rs = getNextMana.executeQuery()) {
+			rs.first();
+			return rs.getInt(1) + 1; // Add one for the *next* mana id
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting next mana id", e);
+			return null;
+		}
+	}
 	private void insertChron(MemeManaUnit unit,List<MemeManaUnit> units) {
 		int i = units.size() - 1;
 		while(i >= 0 && unit.getGainTime() < units.get(i).getGainTime()) {

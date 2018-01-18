@@ -42,10 +42,6 @@ public class MemeManaPouch {
 		units.add(unit);
 	}
 
-	public List<MemeManaUnit> getUnits() {
-		return units;
-	}
-
 	/**
 	 * @return How much mana is currently in this pouch
 	 */

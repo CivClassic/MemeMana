@@ -19,12 +19,7 @@ public class MemeManaManager {
 
 	private void reloadFromDatabase() {
 		this.playerPouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
-		nextManaId = 0;
-		playerPouches.forEach((k,v) -> {
-			for(MemeManaUnit u : v.getUnits()) {
-				if(u.getID() >= nextManaId) {nextManaId = u.getID() + 1;}
-			}
-		});
+		this.nextManaId = MemeManaPlugin.getInstance().getDAO().getNextManaId();
 	}
 
 	public MemeManaPouch getPouch(MemeManaOwner player) {

@@ -4,6 +4,7 @@ import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.namelayer.NameAPI;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
+import com.devotedmc.ExilePearl.PearlType;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import com.github.maxopoly.MemeMana.MemeManaIdentity;
@@ -24,11 +25,11 @@ public class CmdMana extends PlayerCommand {
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		if (args[0] == "show") {
+		if (args[0].equals("show")) {
 			showManaAmount(sender);
-		} else if (args[0] == "refill") {
+		} else if (args[0].equals("refill")) {
 			doRefill(sender,args);
-		} else if (args[0] == "transfer") {
+		} else if (args[0].equals("transfer")) {
 			doTransfer(sender,args);
 		}
 		return true;
@@ -61,12 +62,12 @@ public class CmdMana extends PlayerCommand {
 			msg("<g>That pearl is already at max health!");
 			return;
 		}
-		int repairPerUnitMana = 5;
+		int repairPerUnitMana = MemeManaPlugin.getInstance().getManaConfig().getPearlRefillAmount(pearl.getPearlType());
 		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaIdentity.fromPlayer(player));
 		int manaAvailable = pouch.getContent();
 		int manaToUse = Math.min((int)Math.ceil((maxHealth - pearl.getHealth()) / (double)repairPerUnitMana), manaAvailable);
 		if (pouch.deposit(manaToUse)) {
-			pearl.setHealth(repairPerUnitMana * manaToUse);
+			pearl.setHealth(Math.min(repairPerUnitMana * manaToUse,maxHealth));
 		}
 	}
 

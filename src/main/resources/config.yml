@@ -8,3 +8,10 @@ mysql:
   connectionTimeout: 10000
   idleTimout: 600000
   maxLifetime: 7200000
+manaRotTime: 7776000000 # Milliseconds in 90 days
+manaDecayTime: 2592000000 # Milliseconds in 30 days
+decayMultiplier: 0.5
+maximumDailyMana: 10
+pearlRefillAmount: 
+  EXILE: 1
+  PRISON: 1

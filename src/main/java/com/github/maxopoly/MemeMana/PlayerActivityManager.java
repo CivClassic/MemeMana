@@ -2,6 +2,8 @@ package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaOwner;
+import org.bukkit.Bukkit;
+import com.programmerdan.minecraft.banstick.data.BSPlayer;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,6 +44,6 @@ public class PlayerActivityManager {
 
 	public void giveOutReward(MemeManaOwner player, int amount) {
 		MemeManaPlugin.getInstance().getManaManager().addMana(player,amount);
-		// TODO send message to player?
+		Bukkit.getPlayer(BSPlayer.byId(player.getID()).getUUID()).sendMessage("Gave you " + amount + " mana");
 	}
 }
