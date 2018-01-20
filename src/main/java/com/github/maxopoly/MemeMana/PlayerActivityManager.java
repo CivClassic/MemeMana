@@ -1,17 +1,15 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
+import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
+import com.civclassic.altmanager.AltManager;
 import org.bukkit.Bukkit;
-import com.programmerdan.minecraft.banstick.data.BSPlayer;
 import java.util.Map;
 import java.util.UUID;
 
-import com.programmerdan.minecraft.banstick.data.BSPlayer;
-
 public class PlayerActivityManager {
 
-	private Map<Long, ManaGainStat> stats;
+	private Map<Integer, ManaGainStat> stats;
 	private MemeManaManager manaManager;
 
 	public PlayerActivityManager(MemeManaManager manaManager) {
@@ -23,27 +21,24 @@ public class PlayerActivityManager {
 		this.stats = MemeManaPlugin.getInstance().getDAO().getManaStats();
 	}
 
-	private ManaGainStat getForPlayer(MemeManaOwner ident) {
-		Long pid = ident.selectAlt(stats.keySet());
-		if(pid != null) {
-			return stats.get(pid);
-		} else {
-			ManaGainStat stat = new ManaGainStat(0,0);
-			stats.put(ident.getID(),stat);
-			MemeManaPlugin.getInstance().getDAO().addManaStat(ident,stat);
-			return stat;
+	private ManaGainStat getForPlayer(UUID ident) {
+		int oid = AltManager.instance().getAssociationGroup(ident);
+		stats.putIfAbsent(oid,new ManaGainStat(0,0));
+		ManaGainStat stat = stats.get(oid);
+		MemeManaPlugin.getInstance().getDAO().updateManaStat(MemeManaPlayerOwner.fromUUID(ident),stat);
+		return stat;
+	}
+
+	public void updatePlayer(UUID player) {
+		ManaGainStat stat = getForPlayer(player);
+		if(stat.update()) {
+			MemeManaPlugin.getInstance().getDAO().updateManaStat(MemeManaPlayerOwner.fromUUID(player),stat);
+			giveOutReward(player,stat.getStreak());
 		}
 	}
 
-	public void updatePlayer(MemeManaOwner player) {
-		ManaGainStat relevantAlt = getForPlayer(player);
-		if(relevantAlt.update()) {
-			giveOutReward(player,relevantAlt.getStreak());
-		}
-	}
-
-	public void giveOutReward(MemeManaOwner player, int amount) {
-		MemeManaPlugin.getInstance().getManaManager().addMana(player,amount);
-		Bukkit.getPlayer(BSPlayer.byId(player.getID()).getUUID()).sendMessage("Gave you " + amount + " mana");
+	public void giveOutReward(UUID player, int amount) {
+		MemeManaPlugin.getInstance().getManaManager().addMana(MemeManaPlayerOwner.fromUUID(player),amount);
+		Bukkit.getPlayer(player).sendMessage("Gave you " + amount + " mana");
 	}
 }

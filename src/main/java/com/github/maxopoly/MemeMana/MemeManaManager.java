@@ -9,28 +9,22 @@ import java.util.UUID;
 
 public class MemeManaManager {
 
-	private Map<Long, MemeManaPouch> playerPouches;
+	private Map<Integer, MemeManaPouch> pouches;
 	private int nextManaId;
 
 	public MemeManaManager() {
-		playerPouches = new HashMap<Long, MemeManaPouch>();
 		reloadFromDatabase();
 	}
 
 	private void reloadFromDatabase() {
-		this.playerPouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
+		this.pouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
+		pouches.forEach((i,p) -> {System.out.println("Pouch: " + p.getContent());});
 		this.nextManaId = MemeManaPlugin.getInstance().getDAO().getNextManaId();
 	}
 
-	public MemeManaPouch getPouch(MemeManaOwner player) {
-		Long pid = player.selectAlt(playerPouches.keySet());
-		if(pid != null) {
-			return playerPouches.get(pid);
-		} else {
-			MemeManaPouch pouch = new MemeManaPouch();
-			playerPouches.put(player.getID(),pouch);
-			return pouch;
-		}
+	public MemeManaPouch getPouch(MemeManaOwner owner) {
+		pouches.putIfAbsent(owner.getID(),new MemeManaPouch());
+		return pouches.get(owner.getID());
 	}
 
 	public int getNextManaID() {

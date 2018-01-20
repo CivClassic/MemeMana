@@ -14,10 +14,6 @@ public class MemeManaPouch {
 		this.units = new ArrayList<MemeManaUnit>();
 	}
 
-	public MemeManaPouch(List<MemeManaUnit> units) {
-		this.units = units;
-	}
-
 	/**
 	 * Removes mana past the maximum keep time
 	 */
@@ -38,20 +34,20 @@ public class MemeManaPouch {
 	}
 
 	public void addNewUnit(MemeManaUnit unit) {
-		// TODO mirror in db
 		units.add(unit);
 	}
 
 	/**
 	 * @return How much mana is currently in this pouch
 	 */
-	public int getContent() {
+	public double getContent() {
 		double sum = 0;
 		cleanupPouch();
 		for (MemeManaUnit unit : units) {
+			System.out.println("Summing unit: " + unit.getCurrentAmount());
 			sum += unit.getCurrentAmount();
 		}
-		return (int) sum;
+		return sum;
 	}
 
 	/**

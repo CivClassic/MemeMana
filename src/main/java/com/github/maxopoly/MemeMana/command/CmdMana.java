@@ -7,7 +7,7 @@ import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.model.MemeManaOwner;
-import com.github.maxopoly.MemeMana.MemeManaIdentity;
+import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
@@ -40,9 +40,9 @@ public class CmdMana extends PlayerCommand {
 			msg("Can't show your own mana from console. Try /mana inspect instead");
 			return;
 		}
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaIdentity.fromPlayer((Player)sender));
-		int manaAvailable = pouch.getContent();
-		msg("<i>You have<g> %d<i> mana",manaAvailable);
+		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer((Player)sender));
+		double manaAvailable = pouch.getContent();
+		msg("<i>You have<g> " + String.valueOf(manaAvailable) + "<i> mana");
 	}
 
 	public void doRefill(CommandSender sender, String[] args) {
@@ -63,9 +63,9 @@ public class CmdMana extends PlayerCommand {
 			return;
 		}
 		int repairPerUnitMana = MemeManaPlugin.getInstance().getManaConfig().getPearlRefillAmount(pearl.getPearlType());
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaIdentity.fromPlayer(player));
-		int manaAvailable = pouch.getContent();
-		int manaToUse = Math.min((int)Math.ceil((maxHealth - pearl.getHealth()) / (double)repairPerUnitMana), manaAvailable);
+		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player));
+		double manaAvailable = pouch.getContent();
+		int manaToUse = Math.min((int)Math.ceil((maxHealth - pearl.getHealth()) / (double)repairPerUnitMana), (int)manaAvailable);
 		if (pouch.deposit(manaToUse)) {
 			pearl.setHealth(Math.min(repairPerUnitMana * manaToUse,maxHealth));
 		}
@@ -81,7 +81,7 @@ public class CmdMana extends PlayerCommand {
 			msg("<b>Usage: <i>/mana transfer <c>Player");
 			return;
 		}
-		if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaIdentity.fromPlayer(player),MemeManaIdentity.fromPlayerName(args[1]),5)) {
+		if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaPlayerOwner.fromPlayer(player),MemeManaPlayerOwner.fromPlayerName(args[1]),5)) {
 			msg("");
 		}
 	}
