@@ -5,7 +5,7 @@ import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.model.MemeManaUnit;
 import java.sql.Connection;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -36,28 +36,50 @@ public class MemeManaDAO extends ManagedDatasource {
 		registerMigration(
 				0,
 				false,
-				"CREATE TABLE IF NOT EXISTS manaUnits (id int not null, baseAmount double not null, fillGrade double not null default 1.0,"
-						+ "date datetime NOT NULL default NOW(), ownerId int not null, ownerIdType enum('PLAYER') not null, unique (id), index `ownerIdIndex` (ownerId));",
-				"create table if not exists manaStats (id int not null, idType enum('PLAYER') not null, streak int not null, lastDay bigint not null, primary key(id,idType));");
+				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType enum('PLAYER') not null, primary key(foreignId,foreignIdType));",
+				"create table if not exists manaUnits (id int not null references manaOwners(id), baseAmount double not null, fillGrade double not null default 1.0,"
+						+ "date timestamp not null default now(), ownerId int not null, unique (id), index `ownerIdIndex` (ownerId), primary key(id));",
+				"create table if not exists manaStats (altgroupid int primary key, streak int not null, lastDay bigint not null);");
 	}
+
+	public Integer getOwnerId(MemeManaOwner owner) {
+		try (Connection connection = getConnection();
+				PreparedStatement insertOwnerId = connection
+						.prepareStatement("insert ignore into manaOwners (foreignId, foreignIdType) values(?,?);");
+				PreparedStatement getOwnerId = connection
+						.prepareStatement("select id from manaOwners where foreignId=? and foreignIdType=?;")) {
+			insertOwnerId.setInt(1, owner.getID());
+			insertOwnerId.setString(2, owner.getType().toString());
+			insertOwnerId.execute();
+			getOwnerId.setInt(1, owner.getID());
+			getOwnerId.setString(2, owner.getType().toString());
+			ResultSet rs = getOwnerId.executeQuery();
+			if(rs.next()) {
+				return rs.getInt(1);
+			}
+			return getOwnerId.executeQuery().getInt(1);
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem adding mana unit", e);
+		}
+		return null;
+	}
+
 
 	public void addManaUnit(MemeManaUnit unit, MemeManaOwner owner) {
 		try (Connection connection = getConnection();
 				PreparedStatement addManaUnit = connection
-						.prepareStatement("insert into manaUnits (id, baseAmount, fillGrade, date, ownerId, ownerIdType) values(?,?,?,?,?,?);")) {
+						.prepareStatement("insert into manaUnits (id, baseAmount, fillGrade, date, ownerId) values(?,?,?,?,?);")) {
 			addManaUnit.setInt(1, unit.getID());
 			addManaUnit.setDouble(2, unit.getOriginalAmount());
 			addManaUnit.setDouble(3, unit.getFillGrade());
-			addManaUnit.setDate(4, new Date(unit.getGainTime()));
-			addManaUnit.setInt(5, owner.getID());
-			addManaUnit.setString(6, owner.getType().toString());
+			addManaUnit.setTimestamp(4, new Timestamp(unit.getGainTime()));
+			addManaUnit.setInt(5, getOwnerId(owner));
 			addManaUnit.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem adding mana unit", e);
 		}
 	}
 
-	// TODO: Don't ignore the owner type here
 	public Map<Integer,MemeManaPouch> getManaPouches() {
 		try (Connection connection = getConnection();
 				PreparedStatement getManaPouches = connection
@@ -72,7 +94,7 @@ public class MemeManaDAO extends ManagedDatasource {
 					thisPouch = new MemeManaPouch();
 					thisOwner = rs.getInt(5);
 				}
-				thisPouch.addNewUnit(new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getDate(4).getTime(),rs.getDouble(3)));
+				thisPouch.addNewUnit(new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getTimestamp(4).getTime(),rs.getDouble(3)));
 			}
 			out.put(thisOwner,thisPouch);
 			return out;
@@ -102,14 +124,13 @@ public class MemeManaDAO extends ManagedDatasource {
 		units.add(i + 1,unit);
 	}
 
-	public void updateManaStat(MemeManaOwner owner, ManaGainStat stat) {
+	public void updateManaStat(MemeManaPlayerOwner owner, ManaGainStat stat) {
 		try (Connection connection = getConnection();
 				PreparedStatement updateManaStat = connection
-						.prepareStatement("replace into manaStats (id, idType, streak, lastDay) values(?,?,?,?);")) {
+						.prepareStatement("replace into manaStats (altgroupid, streak, lastDay) values(?,?,?);")) {
 			updateManaStat.setInt(1, owner.getID());
-			updateManaStat.setString(2, owner.getType().toString());
-			updateManaStat.setInt(3, stat.getStreak());
-			updateManaStat.setLong(4, stat.getLastDay());
+			updateManaStat.setInt(2, stat.getStreak());
+			updateManaStat.setLong(3, stat.getLastDay());
 			updateManaStat.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem updating mana stat", e);
@@ -124,7 +145,7 @@ public class MemeManaDAO extends ManagedDatasource {
 			ResultSet rs = getManaStats.executeQuery();
 			Map<Integer,ManaGainStat> out = new HashMap<Integer,ManaGainStat>();
 			while(rs.next()) {
-				out.put(rs.getInt(1),new ManaGainStat(rs.getInt(3),rs.getLong(4)));
+				out.put(rs.getInt(1),new ManaGainStat(rs.getInt(2),rs.getLong(3)));
 			}
 			return out;
 		} catch (SQLException e) {

@@ -23,7 +23,7 @@ public class PlayerActivityManager {
 
 	private ManaGainStat getForPlayer(UUID ident) {
 		int oid = AltManager.instance().getAssociationGroup(ident);
-		stats.putIfAbsent(oid,new ManaGainStat(0,0));
+		stats.putIfAbsent(oid,new ManaGainStat());
 		ManaGainStat stat = stats.get(oid);
 		MemeManaPlugin.getInstance().getDAO().updateManaStat(MemeManaPlayerOwner.fromUUID(ident),stat);
 		return stat;
@@ -35,10 +35,13 @@ public class PlayerActivityManager {
 			MemeManaPlugin.getInstance().getDAO().updateManaStat(MemeManaPlayerOwner.fromUUID(player),stat);
 			giveOutReward(player,stat.getStreak());
 		}
+		else {
+			Bukkit.getPlayer(player).sendMessage("You didn't get any mana");
+		}
 	}
 
 	public void giveOutReward(UUID player, int amount) {
 		MemeManaPlugin.getInstance().getManaManager().addMana(MemeManaPlayerOwner.fromUUID(player),amount);
-		Bukkit.getPlayer(player).sendMessage("Gave you " + amount + " mana");
+		Bukkit.getPlayer(player).sendMessage("You got " + amount + " mana for logging in");
 	}
 }

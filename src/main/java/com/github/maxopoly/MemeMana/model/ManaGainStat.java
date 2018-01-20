@@ -7,6 +7,11 @@ public class ManaGainStat {
 	private int streak;
 	private long lastDay;
 
+	public ManaGainStat() {
+		this.streak = 0;
+		this.lastDay = 0;
+	}
+
 	public ManaGainStat(int streak, long lastDay) {
 		this.streak = streak;
 		this.lastDay = lastDay;
