@@ -44,7 +44,6 @@ public class MemeManaPouch {
 		double sum = 0;
 		cleanupPouch();
 		for (MemeManaUnit unit : units) {
-			System.out.println("Summing unit: " + unit.getCurrentAmount());
 			sum += unit.getCurrentAmount();
 		}
 		return sum;

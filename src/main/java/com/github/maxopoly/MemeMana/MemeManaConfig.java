@@ -23,9 +23,9 @@ public class MemeManaConfig {
 		plugin.reloadConfig();
 		FileConfiguration config = plugin.getConfig();
 		// 90 day default
-		manaRotTime = config.getLong("manaRotTime", 90 * 24 * 60 * 60 * 1000);
+		manaRotTime = config.getLong("manaRotTime", 90L * 24L * 60L * 60L * 1000L);
 		// 30 day default
-		manaDecayTime = config.getLong("manaDecayTime", 30 * 24 * 60 * 60 * 1000);
+		manaDecayTime = config.getLong("manaDecayTime", 30L * 24L * 60L * 60L * 1000L);
 		decayMultiplier = config.getDouble("decayMultiplier", 0.5);
 		maximumDailyMana = config.getInt("maxDailyMana", 10);
 	}

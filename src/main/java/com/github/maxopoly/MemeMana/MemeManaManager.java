@@ -18,7 +18,6 @@ public class MemeManaManager {
 
 	private void reloadFromDatabase() {
 		this.pouches = MemeManaPlugin.getInstance().getDAO().getManaPouches();
-		pouches.forEach((i,p) -> {System.out.println("Pouch: " + p.getContent());});
 		this.nextManaId = MemeManaPlugin.getInstance().getDAO().getNextManaId();
 	}
 
