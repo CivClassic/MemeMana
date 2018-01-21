@@ -6,6 +6,10 @@ depend: [CivModCore, BanStick, ExilePearl]
 commands:
     mana:
         permission: mememana.public
+    manaadmin:
+        permission: mememana.admin
 permissions:
     mememana.public:
         default: true
+    mememana.admin:
+        default: op

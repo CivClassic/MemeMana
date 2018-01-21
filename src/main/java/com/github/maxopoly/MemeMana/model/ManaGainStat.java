@@ -45,6 +45,11 @@ public class ManaGainStat {
 		return lastDay;
 	}
 
+	public void reset() {
+		this.streak = 0;
+		this.lastDay = 0;
+	}
+
 	public static long getDayFromTimeStamp(long timeStamp) {
 		return timeStamp / (24 * 60 * 60 * 1000);
 	}

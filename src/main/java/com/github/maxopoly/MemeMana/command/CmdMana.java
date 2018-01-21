@@ -7,6 +7,7 @@ import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.model.MemeManaOwner;
+import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import java.util.UUID;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.function.IntFunction;
 
 public class CmdMana extends PlayerCommand {
 	public CmdMana(String name) {
@@ -37,12 +39,17 @@ public class CmdMana extends PlayerCommand {
 
 	public void showManaAmount(CommandSender sender) {
 		if (!(sender instanceof Player)) {
-			msg("Can't show your own mana from console. Try /mana inspect instead");
+			msg("Can't show your own mana from console.");
 			return;
 		}
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer((Player)sender));
+		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayer((Player)sender);
+		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
 		double manaAvailable = pouch.getContent();
-		msg("<i>You have<g> " + String.valueOf(manaAvailable) + "<i> mana");
+		msg("<i>You have<g> %s<i> mana",String.valueOf(manaAvailable));
+		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
+		if(stat.getStreak() != 0) {
+			msg("<g>You are on a <i>%d<g> day login streak",stat.getStreak());
+		}
 	}
 
 	public void doRefill(CommandSender sender, String[] args) {
@@ -65,9 +72,16 @@ public class CmdMana extends PlayerCommand {
 		int repairPerUnitMana = MemeManaPlugin.getInstance().getManaConfig().getPearlRefillAmount(pearl.getPearlType());
 		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player));
 		double manaAvailable = pouch.getContent();
-		int manaToUse = Math.min((int)Math.ceil((maxHealth - pearl.getHealth()) / (double)repairPerUnitMana), (int)manaAvailable);
-		if (pouch.deposit(manaToUse)) {
+		int healthBefore = pearl.getHealth();
+		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), (int)manaAvailable);
+		if(manaToUse <= 0) {
+			msg("<b>You don't have enough mana to refill this pearl at all");
+			return;
+		}
+		if(pouch.deposit(manaToUse)) {
 			pearl.setHealth(Math.min(repairPerUnitMana * manaToUse,maxHealth));
+			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
+			msg("<g>The pearl was repaired from <i>%d%%<g> health to <i>%d%%<g> health, consuming <i>%d<g> mana!", toPercent.apply(healthBefore),toPercent.apply(pearl.getHealth()),manaToUse);
 		}
 	}
 
@@ -81,9 +95,23 @@ public class CmdMana extends PlayerCommand {
 			msg("<b>Usage: <i>/mana transfer <c>Player");
 			return;
 		}
-		if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaPlayerOwner.fromPlayer(player),MemeManaPlayerOwner.fromPlayerName(args[1]),5)) {
-			msg("");
+		MemeManaOwner transferTo = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		if (transferTo == null) {
+			msg("<c>%s <b>is not a valid player",args[1]);
+			return;
 		}
+		
+		int transferAmount = (int) MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player)).getContent();
+		if (args.length == 3) {
+			try {
+				transferAmount = Integer.parseInt(args[2]);
+			} catch (Exception e) {
+				msg("<i>%s <b>is not a valid amount of mana",args[2]);
+				return;
+			}
+		}
+		//if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaPlayerOwner.fromPlayer(player),transferTo,transferAmount)) {}
+		msg("Sorry, mana transfer is not implemented yet");
 	}
 
 	public List <String> tabComplete(CommandSender sender, String [] args) {

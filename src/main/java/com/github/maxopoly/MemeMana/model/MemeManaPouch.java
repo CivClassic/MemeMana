@@ -67,10 +67,9 @@ public class MemeManaPouch {
 			if (unit.getCurrentAmount() < leftToRemove) {
 				leftToRemove -= unit.getCurrentAmount();
 				iter.remove();
-				// TODO Mirror removal into DB layer
+				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit);
 			} else {
 				unit.removeAmount(leftToRemove);
-				// TODO Update this in the database
 				break;
 			}
 		}

@@ -19,7 +19,8 @@ public class MemeManaPlayerOwner implements MemeManaOwner {
 	}
 
 	public static MemeManaPlayerOwner fromPlayerName(String playerName) {
-		return MemeManaPlayerOwner.fromUUID(NameAPI.getUUID(playerName));
+		UUID u = NameAPI.getUUID(playerName);
+		return u == null ? null : MemeManaPlayerOwner.fromUUID(NameAPI.getUUID(playerName));
 	}
 
 	public static MemeManaPlayerOwner fromPlayer(Player player) {

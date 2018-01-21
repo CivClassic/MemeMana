@@ -59,7 +59,7 @@ public class MemeManaDAO extends ManagedDatasource {
 			}
 			return getOwnerId.executeQuery().getInt(1);
 		} catch (SQLException e) {
-			logger.log(Level.WARNING, "Problem adding mana unit", e);
+			logger.log(Level.WARNING, "Problem getting owner id", e);
 		}
 		return null;
 	}
@@ -77,6 +77,29 @@ public class MemeManaDAO extends ManagedDatasource {
 			addManaUnit.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem adding mana unit", e);
+		}
+	}
+
+	public void snipeManaUnit(MemeManaUnit unit) {
+		try (Connection connection = getConnection();
+				PreparedStatement snipeManaUnit = connection
+						.prepareStatement("delete from manaUnits where id=?;")) {
+			snipeManaUnit.setInt(1, unit.getID());
+			snipeManaUnit.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem sniping mana unit", e);
+		}
+	}
+
+	public void drainManaUnit(MemeManaUnit unit, double newPercentage) {
+		try (Connection connection = getConnection();
+				PreparedStatement drainManaUnit = connection
+						.prepareStatement("update manaUnits set fillGrade=? where id=?;")) {
+			drainManaUnit.setDouble(1, newPercentage);
+			drainManaUnit.setInt(2, unit.getID());
+			drainManaUnit.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem draining mana unit", e);
 		}
 	}
 

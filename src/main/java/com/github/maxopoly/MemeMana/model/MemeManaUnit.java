@@ -53,6 +53,7 @@ public class MemeManaUnit {
 		double maximumAtThisTime = originalAmount * getDecayMultiplier();
 		double percentage = amt / maximumAtThisTime;
 		this.fillGrade -= percentage;
+		MemeManaPlugin.getInstance().getDAO().drainManaUnit(this,fillGrade);
 	}
 
 	public double getCurrentAmount() {

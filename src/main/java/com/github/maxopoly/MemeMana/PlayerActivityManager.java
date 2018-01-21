@@ -21,18 +21,19 @@ public class PlayerActivityManager {
 		this.stats = MemeManaPlugin.getInstance().getDAO().getManaStats();
 	}
 
-	private ManaGainStat getForPlayer(UUID ident) {
-		int oid = AltManager.instance().getAssociationGroup(ident);
+	public ManaGainStat getForPlayer(MemeManaPlayerOwner ident) {
+		int oid = ident.getID();
 		stats.putIfAbsent(oid,new ManaGainStat());
 		ManaGainStat stat = stats.get(oid);
-		MemeManaPlugin.getInstance().getDAO().updateManaStat(MemeManaPlayerOwner.fromUUID(ident),stat);
+		MemeManaPlugin.getInstance().getDAO().updateManaStat(ident,stat);
 		return stat;
 	}
 
 	public void updatePlayer(UUID player) {
-		ManaGainStat stat = getForPlayer(player);
+		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromUUID(player);
+		ManaGainStat stat = getForPlayer(owner);
 		if(stat.update()) {
-			MemeManaPlugin.getInstance().getDAO().updateManaStat(MemeManaPlayerOwner.fromUUID(player),stat);
+			MemeManaPlugin.getInstance().getDAO().updateManaStat(owner,stat);
 			giveOutReward(player,stat.getStreak());
 		}
 		else {
