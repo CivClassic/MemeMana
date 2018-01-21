@@ -79,7 +79,7 @@ public class CmdMana extends PlayerCommand {
 			return;
 		}
 		if(pouch.deposit(manaToUse)) {
-			pearl.setHealth(Math.min(repairPerUnitMana * manaToUse,maxHealth));
+			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
 			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
 			msg("<g>The pearl was repaired from <i>%d%%<g> health to <i>%d%%<g> health, consuming <i>%d<g> mana!", toPercent.apply(healthBefore),toPercent.apply(pearl.getHealth()),manaToUse);
 		}

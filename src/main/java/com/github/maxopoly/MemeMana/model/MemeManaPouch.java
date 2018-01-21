@@ -64,7 +64,7 @@ public class MemeManaPouch {
 		Iterator<MemeManaUnit> iter = units.iterator();
 		while (iter.hasNext() && leftToRemove > 0.0001f) {
 			MemeManaUnit unit = iter.next();
-			if (unit.getCurrentAmount() < leftToRemove) {
+			if (unit.getCurrentAmount() <= leftToRemove) {
 				leftToRemove -= unit.getCurrentAmount();
 				iter.remove();
 				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit);

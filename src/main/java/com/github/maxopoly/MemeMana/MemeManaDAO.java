@@ -42,6 +42,21 @@ public class MemeManaDAO extends ManagedDatasource {
 				"create table if not exists manaStats (altgroupid int primary key, streak int not null, lastDay bigint not null);");
 	}
 
+	public void cleanseManaUnits() {
+		try (Connection connection = getConnection();
+				PreparedStatement cleanseManaUnits = connection
+						.prepareStatement("delete from manaUnits where fillGrade < ? or date < ?;")) {
+			double epsilon = 0.0001;
+			cleanseManaUnits.setDouble(1, epsilon);
+			long currentTime = System.currentTimeMillis();
+			long rotTime = MemeManaPlugin.getInstance().getManaConfig().getManaRotTime();
+			cleanseManaUnits.setLong(2, currentTime - rotTime);
+			cleanseManaUnits.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem cleansing mana units", e);
+		}
+	}
+
 	public Integer getOwnerId(MemeManaOwner owner) {
 		try (Connection connection = getConnection();
 				PreparedStatement insertOwnerId = connection

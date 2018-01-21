@@ -23,6 +23,7 @@ public class MemeManaPlugin extends ACivMod {
 		instance = this;
 		config = new MemeManaConfig(this);
 		dao = config.setupDatabase();
+		dao.cleanseManaUnits();
 		manaManager = new MemeManaManager();
 		activityManager = new PlayerActivityManager(manaManager);
 		registerListener();
