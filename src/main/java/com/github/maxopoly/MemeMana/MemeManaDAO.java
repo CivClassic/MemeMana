@@ -37,8 +37,8 @@ public class MemeManaDAO extends ManagedDatasource {
 				0,
 				false,
 				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType enum('PLAYER') not null, primary key(foreignId,foreignIdType));",
-				"create table if not exists manaUnits (id int not null references manaOwners(id), baseAmount double not null, fillGrade double not null default 1.0,"
-						+ "date timestamp not null default now(), ownerId int not null, unique (id), index `ownerIdIndex` (ownerId), primary key(id));",
+				"create table if not exists manaUnits (id int not null, baseAmount double not null, fillGrade double not null default 1.0,"
+						+ "date timestamp not null default now(), ownerId int not null references manaOwners(id), unique (id), index `ownerIdIndex` (ownerId), primary key(id));",
 				"create table if not exists manaStats (altgroupid int primary key, streak int not null, lastDay bigint not null);");
 	}
 
