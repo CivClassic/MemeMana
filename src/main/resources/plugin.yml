@@ -2,16 +2,14 @@ name: ${project.name}
 main: com.github.maxopoly.MemeMana.MemeManaPlugin
 author: Maxopoly
 version: ${project.version}
-depend: [CivModCore, Donum]
+depend: [CivModCore, BanStick, ExilePearl]
 commands:
-    fm:
-        permission: fm.public
-    fmc:
-        permission: fm.op
-    fmsrc:
-        permission: fm.op
+    mana:
+        permission: mememana.public
+    manaadmin:
+        permission: mememana.admin
 permissions:
-    fm.public:
+    mememana.public:
         default: true
-    fm.op:
+    mememana.admin:
         default: op

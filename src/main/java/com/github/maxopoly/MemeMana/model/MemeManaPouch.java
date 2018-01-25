@@ -3,11 +3,16 @@ package com.github.maxopoly.MemeMana.model;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 public class MemeManaPouch {
 
 	// chronologically ordered!
 	private List<MemeManaUnit> units;
+
+	public MemeManaPouch() {
+		this.units = new ArrayList<MemeManaUnit>();
+	}
 
 	/**
 	 * Removes mana past the maximum keep time
@@ -28,21 +33,20 @@ public class MemeManaPouch {
 		}
 	}
 
-	public void addNewUnit(int id, double amount) {
-		// TODO mirror in db
-		units.add(new MemeManaUnit(id, amount));
+	public void addNewUnit(MemeManaUnit unit) {
+		units.add(unit);
 	}
 
 	/**
 	 * @return How much mana is currently in this pouch
 	 */
-	public int getContent() {
+	public double getContent() {
 		double sum = 0;
 		cleanupPouch();
 		for (MemeManaUnit unit : units) {
 			sum += unit.getCurrentAmount();
 		}
-		return (int) sum;
+		return sum;
 	}
 
 	/**
@@ -60,13 +64,12 @@ public class MemeManaPouch {
 		Iterator<MemeManaUnit> iter = units.iterator();
 		while (iter.hasNext() && leftToRemove > 0.0001f) {
 			MemeManaUnit unit = iter.next();
-			if (unit.getCurrentAmount() < leftToRemove) {
+			if (unit.getCurrentAmount() <= leftToRemove) {
 				leftToRemove -= unit.getCurrentAmount();
 				iter.remove();
-				// TODO Mirror removal into DB layer
+				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit);
 			} else {
 				unit.removeAmount(leftToRemove);
-				// TODO Update this in the database
 				break;
 			}
 		}

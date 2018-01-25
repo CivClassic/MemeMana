@@ -7,6 +7,11 @@ public class ManaGainStat {
 	private int streak;
 	private long lastDay;
 
+	public ManaGainStat() {
+		this.streak = 0;
+		this.lastDay = 0;
+	}
+
 	public ManaGainStat(int streak, long lastDay) {
 		this.streak = streak;
 		this.lastDay = lastDay;
@@ -24,7 +29,7 @@ public class ManaGainStat {
 			return false;
 		}
 		if (currentDay == lastDay + 1) {
-			streak = Math.max(streak + 1, MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana());
+			streak = Math.min(streak + 1, MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana());
 		} else {
 			streak = 1;
 		}
@@ -40,8 +45,13 @@ public class ManaGainStat {
 		return lastDay;
 	}
 
+	public void reset() {
+		this.streak = 0;
+		this.lastDay = 0;
+	}
+
 	public static long getDayFromTimeStamp(long timeStamp) {
-		return timeStamp % (24 * 60 * 60 * 1000);
+		return timeStamp / (24 * 60 * 60 * 1000);
 	}
 
 }
