@@ -4,9 +4,17 @@ author: Maxopoly
 version: ${project.version}
 depend: [CivModCore, BanStick, ExilePearl]
 commands:
-    mana:
+    manashow:
         permission: mememana.public
-    manaadmin:
+    manatransfer:
+        permission: mememana.public
+    manarefill:
+        permission: mememana.public
+    manareset:
+        permission: mememana.admin
+    manainspect:
+        permission: mememana.admin
+    managive:
         permission: mememana.admin
 permissions:
     mememana.public:
