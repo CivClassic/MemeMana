@@ -1,21 +1,18 @@
 package com.github.maxopoly.MemeMana.command;
 
-import vg.civcraft.mc.civmodcore.command.PlayerCommand;
-import vg.civcraft.mc.namelayer.NameAPI;
-import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
-import com.devotedmc.ExilePearl.PearlType;
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
-import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
+import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.command.CommandSender;
-import java.util.UUID;
-import java.util.List;
+import com.github.maxopoly.MemeMana.model.ManaGainStat;
+import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.model.owners.MemeManaOwner;
+import com.github.maxopoly.MemeMana.model.owners.MemeManaPlayerOwner;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.IntFunction;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 
 public class CmdMana extends PlayerCommand {
 	public CmdMana(String name) {
@@ -26,6 +23,7 @@ public class CmdMana extends PlayerCommand {
 		setArguments(1,3);
 	}
 
+	@Override
 	public boolean execute(CommandSender sender, String [] args) {
 		if (args[0].equals("show")) {
 			showManaAmount(sender);
@@ -43,7 +41,7 @@ public class CmdMana extends PlayerCommand {
 			return;
 		}
 		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayer((Player)sender);
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
+		MemeManaPouch pouch = owner.getPouch();
 		double manaAvailable = pouch.getContent();
 		msg("<i>You have<g> %s<i> mana",String.valueOf(manaAvailable));
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
@@ -100,7 +98,7 @@ public class CmdMana extends PlayerCommand {
 			msg("<c>%s <b>is not a valid player",args[1]);
 			return;
 		}
-		
+
 		int transferAmount = (int) MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player)).getContent();
 		if (args.length == 3) {
 			try {
@@ -114,6 +112,7 @@ public class CmdMana extends PlayerCommand {
 		msg("Sorry, mana transfer is not implemented yet");
 	}
 
+	@Override
 	public List <String> tabComplete(CommandSender sender, String [] args) {
 		return new LinkedList <String> (); //empty list
 	}

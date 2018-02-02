@@ -1,20 +1,20 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.model.MemeManaUnit;
+import com.github.maxopoly.MemeMana.model.owners.MemeManaOwner;
+import com.github.maxopoly.MemeMana.model.owners.MemeManaPlayerOwner;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
-import java.sql.Timestamp;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 
 public class MemeManaDAO extends ManagedDatasource {
@@ -36,12 +36,15 @@ public class MemeManaDAO extends ManagedDatasource {
 		registerMigration(
 				0,
 				false,
-				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType enum('PLAYER') not null, primary key(foreignId,foreignIdType));",
+				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType tinyint not null, primary key(foreignId,foreignIdType));",
 				"create table if not exists manaUnits (id int not null, baseAmount double not null, fillGrade double not null default 1.0,"
 						+ "date timestamp not null default now(), ownerId int not null references manaOwners(id), unique (id), index `ownerIdIndex` (ownerId), primary key(id));",
 				"create table if not exists manaStats (altgroupid int primary key, streak int not null, lastDay bigint not null);");
 	}
 
+	/**
+	 * Deletes all mana units older than the mana rot time from the database
+	 */
 	public void cleanseManaUnits() {
 		try (Connection connection = getConnection();
 				PreparedStatement cleanseManaUnits = connection
@@ -57,29 +60,11 @@ public class MemeManaDAO extends ManagedDatasource {
 		}
 	}
 
-	public Integer getOwnerId(MemeManaOwner owner) {
-		try (Connection connection = getConnection();
-				PreparedStatement insertOwnerId = connection
-						.prepareStatement("insert ignore into manaOwners (foreignId, foreignIdType) values(?,?);");
-				PreparedStatement getOwnerId = connection
-						.prepareStatement("select id from manaOwners where foreignId=? and foreignIdType=?;")) {
-			insertOwnerId.setInt(1, owner.getID());
-			insertOwnerId.setString(2, owner.getType().toString());
-			insertOwnerId.execute();
-			getOwnerId.setInt(1, owner.getID());
-			getOwnerId.setString(2, owner.getType().toString());
-			ResultSet rs = getOwnerId.executeQuery();
-			if(rs.next()) {
-				return rs.getInt(1);
-			}
-			return getOwnerId.executeQuery().getInt(1);
-		} catch (SQLException e) {
-			logger.log(Level.WARNING, "Problem getting owner id", e);
-		}
-		return null;
-	}
-
-
+	/**
+	 * Adds a single mana unit, which previously didn't exist, to the database
+	 * @param unit Mana unit to add
+	 * @param owner Owner of the new mana
+	 */
 	public void addManaUnit(MemeManaUnit unit, MemeManaOwner owner) {
 		try (Connection connection = getConnection();
 				PreparedStatement addManaUnit = connection
@@ -88,13 +73,17 @@ public class MemeManaDAO extends ManagedDatasource {
 			addManaUnit.setDouble(2, unit.getOriginalAmount());
 			addManaUnit.setDouble(3, unit.getFillGrade());
 			addManaUnit.setTimestamp(4, new Timestamp(unit.getGainTime()));
-			addManaUnit.setInt(5, getOwnerId(owner));
+			addManaUnit.setInt(5, owner.getID());
 			addManaUnit.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem adding mana unit", e);
 		}
 	}
 
+	/**
+	 * Deletes a single mana unit from the database
+	 * @param unit ManaUnit to delete
+	 */
 	public void snipeManaUnit(MemeManaUnit unit) {
 		try (Connection connection = getConnection();
 				PreparedStatement snipeManaUnit = connection
@@ -106,40 +95,82 @@ public class MemeManaDAO extends ManagedDatasource {
 		}
 	}
 
-	public void drainManaUnit(MemeManaUnit unit, double newPercentage) {
+	/**
+	 * Updates a mana unit by adjusting it's owner and fillgrade
+	 * @param unit
+	 * @param newPercentage
+	 */
+	public void updateManaUnit(MemeManaUnit unit, double newPercentage, MemeManaOwner newOwner) {
 		try (Connection connection = getConnection();
-				PreparedStatement drainManaUnit = connection
-						.prepareStatement("update manaUnits set fillGrade=? where id=?;")) {
-			drainManaUnit.setDouble(1, newPercentage);
-			drainManaUnit.setInt(2, unit.getID());
-			drainManaUnit.execute();
+				PreparedStatement updateManaUnit = connection
+						.prepareStatement("update manaUnits set fillGrade=?, set ownerId = ? where id=?;")) {
+			updateManaUnit.setDouble(1, newPercentage);
+			updateManaUnit.setInt(2, newOwner.getID());
+			updateManaUnit.setInt(3, unit.getID());
+			updateManaUnit.execute();
 		} catch (SQLException e) {
-			logger.log(Level.WARNING, "Problem draining mana unit", e);
+			logger.log(Level.WARNING, "Problem updating mana unit", e);
 		}
 	}
 
-	public Map<Integer,MemeManaPouch> getManaPouches() {
+
+	/**
+	 * Updates the owner of a given mana unit in the db
+	 * @param unit Unit to update owner for
+	 * @param newOwner New owner of the mana
+	 */
+	public void updateManaOwner(MemeManaUnit unit, MemeManaOwner newOwner) {
+		updateManaUnit(unit, unit.getFillGrade(), newOwner);
+	}
+
+	/**
+	 * Updates the fill grade of a single mana unit in the db
+	 * @param unit
+	 */
+	public void updateManaFillGrade(MemeManaUnit unit) {
 		try (Connection connection = getConnection();
-				PreparedStatement getManaPouches = connection
-						.prepareStatement("select * from manaUnits order by ownerId, date;");
-				ResultSet rs = getManaPouches.executeQuery();) {
-			Map<Integer,MemeManaPouch> out = new HashMap<Integer,MemeManaPouch>();
+				PreparedStatement updateManaUnit = connection
+						.prepareStatement("update manaUnits set fillGrade=? where id=?;")) {
+			updateManaUnit.setDouble(1, unit.getFillGrade());
+			updateManaUnit.setInt(2, unit.getID());
+			updateManaUnit.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem updating mana unit", e);
+		}
+	}
+
+	public Map<Integer, MemeManaOwner> loadAllMana() {
+		Map<Integer,MemeManaOwner> owners = new HashMap<Integer,MemeManaOwner>();
+		try (Connection connection = getConnection();
+				PreparedStatement getManaOwner = connection
+						.prepareStatement("select id, foreignId, foreignIdType from manaOwners;");
+				ResultSet rs = getManaOwner.executeQuery();) {
 			MemeManaPouch thisPouch = new MemeManaPouch();
 			int thisOwner = -1;
 			while(rs.next()) {
-				if(thisOwner != rs.getInt(5)) {
-					out.put(thisOwner,thisPouch);
-					thisPouch = new MemeManaPouch();
-					thisOwner = rs.getInt(5);
-				}
-				thisPouch.addNewUnit(new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getTimestamp(4).getTime(),rs.getDouble(3)));
+				int id = rs.getInt(1);
+				owners.put(id, (MemeManaOwner) MemeManaOwner.getOwnerClass(rs.getInt(3)).getConstructor(int.class, int.class).newInstance(id, rs.getInt(2)));
 			}
-			out.put(thisOwner,thisPouch);
-			return out;
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting mana owners", e);
+			return null;
+		} catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+			logger.log(Level.WARNING, "Error instantiating mana owners", e);
+			return null;
+		}
+
+		try (Connection connection = getConnection();
+				PreparedStatement getManaPouches = connection
+						.prepareStatement("select id, baseAmount, fillGrade, timestamp, ownerId from manaUnits order by ownerId, date;");
+				ResultSet rs = getManaPouches.executeQuery();) {
+			while(rs.next()) {
+				owners.get(rs.getInt(5)).getPouch().addNewUnit(new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getTimestamp(4).getTime(),rs.getDouble(3)));
+			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem getting mana pouches", e);
 			return null;
 		}
+		return owners;
 	}
 
 	public Integer getNextManaId() {
@@ -153,13 +184,6 @@ public class MemeManaDAO extends ManagedDatasource {
 			logger.log(Level.WARNING, "Problem getting next mana id", e);
 			return null;
 		}
-	}
-	private void insertChron(MemeManaUnit unit,List<MemeManaUnit> units) {
-		int i = units.size() - 1;
-		while(i >= 0 && unit.getGainTime() < units.get(i).getGainTime()) {
-			i--;
-		}
-		units.add(i + 1,unit);
 	}
 
 	public void updateManaStat(MemeManaPlayerOwner owner, ManaGainStat stat) {

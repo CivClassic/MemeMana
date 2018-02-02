@@ -1,9 +1,11 @@
 package com.github.maxopoly.MemeMana.model;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MemeManaPouch {
 
@@ -37,6 +39,10 @@ public class MemeManaPouch {
 		units.add(unit);
 	}
 
+	public void sortManaChronologically() {
+		units.sort(Comparator.comparing(MemeManaUnit::getGainTime));
+	}
+
 	/**
 	 * @return How much mana is currently in this pouch
 	 */
@@ -50,16 +56,17 @@ public class MemeManaPouch {
 	}
 
 	/**
-	 * Attempts to remove the given amount from this pouch
+	 * Attempts to remove the given amount from this pouch, deleting it permanently
 	 *
 	 * @param amount
 	 *            Amount to remove
-	 * @return True if removal was successfull, false if not
+	 * @return True if successfull, false if not
 	 */
 	public boolean deposit(double amount) {
 		if (getContent() < amount) {
 			return false;
 		}
+		List <MemeManaUnit> units = new LinkedList<MemeManaUnit>();
 		double leftToRemove = amount;
 		Iterator<MemeManaUnit> iter = units.iterator();
 		while (iter.hasNext() && leftToRemove > 0.0001f) {
@@ -69,10 +76,13 @@ public class MemeManaPouch {
 				iter.remove();
 				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit);
 			} else {
-				unit.removeAmount(leftToRemove);
+				double maximumAtThisTime = unit.getOriginalAmount() * unit.getDecayMultiplier();
+				double percentage = leftToRemove / maximumAtThisTime;
+				unit.setFillGrade(unit.getFillGrade() - percentage);
 				break;
 			}
 		}
 		return true;
 	}
+
 }

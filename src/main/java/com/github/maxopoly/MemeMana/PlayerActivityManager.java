@@ -1,7 +1,8 @@
 package com.github.maxopoly.MemeMana;
 
+import com.github.maxopoly.MemeMana.model.owners.MemeManaPlayerOwner;
+
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
 import com.civclassic.altmanager.AltManager;
 import org.bukkit.Bukkit;
 import java.util.Map;

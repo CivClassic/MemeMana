@@ -1,21 +1,14 @@
 package com.github.maxopoly.MemeMana.command;
 
-import vg.civcraft.mc.civmodcore.command.PlayerCommand;
-import vg.civcraft.mc.namelayer.NameAPI;
-import com.devotedmc.ExilePearl.ExilePearlPlugin;
-import com.devotedmc.ExilePearl.ExilePearl;
-import com.devotedmc.ExilePearl.PearlType;
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
-import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.command.CommandSender;
-import java.util.UUID;
-import java.util.List;
+import com.github.maxopoly.MemeMana.model.ManaGainStat;
+import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.model.owners.MemeManaOwner;
+import com.github.maxopoly.MemeMana.model.owners.MemeManaPlayerOwner;
 import java.util.LinkedList;
-import java.util.function.IntFunction;
+import java.util.List;
+import org.bukkit.command.CommandSender;
+import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 
 public class CmdManaAdmin extends PlayerCommand {
 	public CmdManaAdmin(String name) {
@@ -26,6 +19,7 @@ public class CmdManaAdmin extends PlayerCommand {
 		setArguments(1,3);
 	}
 
+	@Override
 	public boolean execute(CommandSender sender, String [] args) {
 		if (args[0].equals("inspect")) {
 			inspectManaAmount(sender,args);
@@ -50,7 +44,7 @@ public class CmdManaAdmin extends PlayerCommand {
 			msg("<c>%s <b>is not a valid mana owner",args[1]);
 			return;
 		}
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
+		MemeManaPouch pouch = owner.getPouch();
 		double manaAvailable = pouch.getContent();
 		msg("<c>%s<i> has <g>%s<i> mana",args[1],String.valueOf(manaAvailable));
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
@@ -80,7 +74,7 @@ public class CmdManaAdmin extends PlayerCommand {
 			msg("<i>%s <b>is not a valid amount of mana",args[2]);
 			return;
 		}
-		MemeManaPlugin.getInstance().getManaManager().addMana(owner,giveAmount);
+		//MemeManaPlugin.getInstance().getManaManager().addMana(owner,giveAmount);
 		msg("<g>Gave <c>%s <i>%d<g> mana",args[1],giveAmount);
 	}
 
@@ -100,6 +94,7 @@ public class CmdManaAdmin extends PlayerCommand {
 		msg("<g>Reset mana statistics for <c>%s",args[1]);
 	}
 
+	@Override
 	public List <String> tabComplete(CommandSender sender, String [] args) {
 		return new LinkedList <String> (); //empty list
 	}

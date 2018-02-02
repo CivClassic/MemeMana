@@ -1,7 +1,7 @@
 package com.github.maxopoly.MemeMana;
 
-import com.github.maxopoly.MemeMana.listener.LoginListener;
 import com.github.maxopoly.MemeMana.command.MemeManaCommandHandler;
+import com.github.maxopoly.MemeMana.listener.LoginListener;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 public class MemeManaPlugin extends ACivMod {
@@ -10,8 +10,8 @@ public class MemeManaPlugin extends ACivMod {
 
 	private MemeManaConfig config;
 	private PlayerActivityManager activityManager;
-	private MemeManaManager manaManager;
 	private MemeManaDAO dao;
+	private MemeManaOwnerManager ownerManager;
 
 	public static MemeManaPlugin getInstance() {
 		return instance;
@@ -24,8 +24,8 @@ public class MemeManaPlugin extends ACivMod {
 		config = new MemeManaConfig(this);
 		dao = config.setupDatabase();
 		dao.cleanseManaUnits();
-		manaManager = new MemeManaManager();
 		activityManager = new PlayerActivityManager(manaManager);
+		ownerManager = new MemeManaOwnerManager();
 		registerListener();
 		// Register commands.
 		MemeManaCommandHandler handle = new MemeManaCommandHandler();
@@ -56,6 +56,10 @@ public class MemeManaPlugin extends ACivMod {
 
 	public MemeManaDAO getDAO() {
 		return dao;
+	}
+
+	public MemeManaOwnerManager getOwnerManager() {
+		return ownerManager;
 	}
 
 }
