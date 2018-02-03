@@ -1,48 +1,55 @@
 package com.github.maxopoly.MemeMana;
 
-import com.github.maxopoly.MemeMana.model.owners.MemeManaOwner;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
+import java.util.stream.Stream;
+import vg.civcraft.mc.namelayer.NameAPI;
+import com.civclassic.altmanager.AltManager;
+import org.bukkit.entity.Player;
+
+import com.github.maxopoly.MemeMana.model.MemeManaUnit;
+import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 
 public class MemeManaOwnerManager {
 
-	private Map <Integer, Map<Integer, MemeManaOwner>> ownersByTypeAndExternal;
-	private Map <Integer, MemeManaOwner> ownersByInternal;
-	private int nextManaId;
+	private Map <OwnerType, Map<Integer, Integer>> ownersByTypeAndExternal;
+
+	//this is barely used during runtime, so this slightly slow loop is fine
+	public static OwnerType ownerTypeFromMagicNumber(int magic) {
+		return Stream.of(OwnerType.values())
+			.filter(t -> t.magicOwnerTypeNumber == magic)
+			.findFirst().orElse(null);
+	}
 
 	public MemeManaOwnerManager() {
-		this.ownersByTypeAndExternal = new TreeMap<Integer, Map<Integer,MemeManaOwner>>();
-		this.ownersByInternal = new TreeMap<Integer, MemeManaOwner>();
 		reloadFromDatabase();
 	}
 
-
 	private void reloadFromDatabase() {
-		for(MemeManaOwner owner : MemeManaPlugin.getInstance().getDAO().loadAllMana().values()) {
-			register(owner);
-		}
-		this.nextManaId = MemeManaPlugin.getInstance().getDAO().getNextManaId();
+		this.ownersByTypeAndExternal = MemeManaPlugin.getInstance().getDAO().loadAllManaOwners();
 	}
 
-	public void register(MemeManaOwner owner) {
-		Map <Integer, MemeManaOwner> typedOwners = ownersByTypeAndExternal.get(owner.getOwnerType());
-		if (typedOwners == null) {
-			typedOwners = new TreeMap<Integer, MemeManaOwner>();
-			ownersByTypeAndExternal.put(owner.getOwnerType(), typedOwners);
+	public int getOwnerByExternal(OwnerType ownerType, int externalId) {
+		Integer mOwner = ownersByTypeAndExternal.get(ownerType).get(externalId);
+		if(mOwner == null){
+			MemeManaPlugin.getInstance().getDAO().registerManaOwner(ownerType,externalId);
+			mOwner = MemeManaPlugin.getInstance().getDAO().getManaOwnerByForeign(ownerType,externalId);
+			ownersByTypeAndExternal.get(ownerType).put(externalId,mOwner);
 		}
-		typedOwners.put(owner.getForeignId(), owner);
-		ownersByInternal.put(owner.getID(), owner);
+		return mOwner;
 	}
 
-	public MemeManaOwner getOwnerByExternal(int ownerType, int externalId) {
-		Map <Integer, MemeManaOwner> typedOwners = ownersByTypeAndExternal.get(ownerType);
-		if (typedOwners == null) {
-			return null;
-		}
-		return typedOwners.get(externalId);
+	public static int fromUUID(UUID uuid) {
+		return MemeManaPlugin.getInstance().getOwnerManager().getOwnerByExternal(OwnerType.PLAYER_OWNER,AltManager.instance().getAssociationGroup(uuid));
 	}
 
-	public MemeManaOwner getOwnerByInternal(int internalId) {
-		return ownersByInternal.get(internalId);
+	public static int fromPlayerName(String playerName) {
+		UUID u = NameAPI.getUUID(playerName);
+		return u == null ? null : fromUUID(u);
+	}
+
+	public static int fromPlayer(Player player) {
+		return fromUUID(player.getUniqueId());
 	}
 }

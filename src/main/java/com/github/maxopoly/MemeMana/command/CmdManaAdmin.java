@@ -3,14 +3,17 @@ package com.github.maxopoly.MemeMana.command;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.owners.MemeManaOwner;
-import com.github.maxopoly.MemeMana.model.owners.MemeManaPlayerOwner;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
+import com.github.maxopoly.MemeMana.MemeManaManager;
 import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 
 public class CmdManaAdmin extends PlayerCommand {
+	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
+	private static final MemeManaManager manaManager = MemeManaPlugin.getInstance().getManaManager();
+
 	public CmdManaAdmin(String name) {
 		super(name);
 		setIdentifier("manaadmin");
@@ -39,12 +42,12 @@ public class CmdManaAdmin extends PlayerCommand {
 			msg("<b>You must specify the player to inspect");
 			return;
 		}
-		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		Integer owner = MemeManaOwnerManager.fromPlayerName(args[1]);
 		if(owner == null) {
 			msg("<c>%s <b>is not a valid mana owner",args[1]);
 			return;
 		}
-		MemeManaPouch pouch = owner.getPouch();
+		MemeManaPouch pouch = manaManager.getPouch(owner);
 		double manaAvailable = pouch.getContent();
 		msg("<c>%s<i> has <g>%s<i> mana",args[1],String.valueOf(manaAvailable));
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
@@ -58,7 +61,7 @@ public class CmdManaAdmin extends PlayerCommand {
 			msg("<b>You must specify the player to give mana to");
 			return;
 		}
-		MemeManaOwner owner = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		Integer owner = MemeManaOwnerManager.fromPlayerName(args[1]);
 		if(owner == null) {
 			msg("<c>%s <b>is not a valid mana owner",args[1]);
 			return;
@@ -74,7 +77,7 @@ public class CmdManaAdmin extends PlayerCommand {
 			msg("<i>%s <b>is not a valid amount of mana",args[2]);
 			return;
 		}
-		//MemeManaPlugin.getInstance().getManaManager().addMana(owner,giveAmount);
+		manaManager.addMana(owner,giveAmount);
 		msg("<g>Gave <c>%s <i>%d<g> mana",args[1],giveAmount);
 	}
 
@@ -83,7 +86,7 @@ public class CmdManaAdmin extends PlayerCommand {
 			msg("<b>You must specify the player to reset stats for");
 			return;
 		}
-		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		Integer owner = MemeManaOwnerManager.fromPlayerName(args[1]);
 		if(owner == null) {
 			msg("<c>%s <b>is not a valid player",args[1]);
 			return;

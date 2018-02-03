@@ -12,6 +12,7 @@ public class MemeManaPlugin extends ACivMod {
 	private PlayerActivityManager activityManager;
 	private MemeManaDAO dao;
 	private MemeManaOwnerManager ownerManager;
+	private MemeManaManager manaManager;
 
 	public static MemeManaPlugin getInstance() {
 		return instance;
@@ -24,8 +25,9 @@ public class MemeManaPlugin extends ACivMod {
 		config = new MemeManaConfig(this);
 		dao = config.setupDatabase();
 		dao.cleanseManaUnits();
-		activityManager = new PlayerActivityManager(manaManager);
+		activityManager = new PlayerActivityManager();
 		ownerManager = new MemeManaOwnerManager();
+		manaManager = new MemeManaManager();
 		registerListener();
 		// Register commands.
 		MemeManaCommandHandler handle = new MemeManaCommandHandler();
@@ -50,10 +52,6 @@ public class MemeManaPlugin extends ACivMod {
 		return activityManager;
 	}
 
-	public MemeManaManager getManaManager() {
-		return manaManager;
-	}
-
 	public MemeManaDAO getDAO() {
 		return dao;
 	}
@@ -62,4 +60,7 @@ public class MemeManaPlugin extends ACivMod {
 		return ownerManager;
 	}
 
+	public MemeManaManager getManaManager() {
+		return manaManager;
+	}
 }
