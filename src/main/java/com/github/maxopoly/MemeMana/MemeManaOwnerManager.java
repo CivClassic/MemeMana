@@ -5,6 +5,8 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Stream;
 import vg.civcraft.mc.namelayer.NameAPI;
+import vg.civcraft.mc.namelayer.group.Group;
+import vg.civcraft.mc.namelayer.GroupManager;
 import com.civclassic.altmanager.AltManager;
 import org.bukkit.entity.Player;
 
@@ -51,5 +53,19 @@ public class MemeManaOwnerManager {
 
 	public static int fromPlayer(Player player) {
 		return fromUUID(player.getUniqueId());
+	}
+
+	public static int fromNameLayerGroup(Group grp) {
+		return grp == null ? null : MemeManaPlugin.getInstance().getOwnerManager().getOwnerByExternal(OwnerType.NAMELAYER_GROUP_OWNER,grp.getGroupId());
+	}
+
+	public static Integer fromNameLayerGroup(String grpName) {
+		return fromNameLayerGroup(GroupManager.getGroup(grpName));
+	}
+
+	public static Integer fromName(String ownerName) {
+		Integer ownerId = fromPlayerName(ownerName);
+		if(ownerId != null) { return ownerId; }
+		return fromNameLayerGroup(ownerName);
 	}
 }

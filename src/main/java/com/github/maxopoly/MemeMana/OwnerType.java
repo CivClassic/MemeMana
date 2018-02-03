@@ -4,7 +4,8 @@ package com.github.maxopoly.MemeMana;
  * database so they must be stable between versions
  */
 public enum OwnerType{
-	PLAYER_OWNER(0);
+	PLAYER_OWNER(0),
+	NAMELAYER_GROUP_OWNER(1);
 
 	public final int magicOwnerTypeNumber;
 

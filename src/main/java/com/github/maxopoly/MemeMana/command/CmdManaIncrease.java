@@ -20,13 +20,13 @@ public class CmdManaIncrease extends PlayerCommand {
 	public CmdManaIncrease(String name) {
 		super(name);
 		setIdentifier("manaincrease");
-		setDescription("Increase a player's mana");
-		setUsage("/manaincrease Player Amount");
+		setDescription("Increase someone's mana");
+		setUsage("/manaincrease Owner Amount");
 		setArguments(2,2);
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		Integer owner = MemeManaOwnerManager.fromPlayerName(args[0]);
+		Integer owner = MemeManaOwnerManager.fromName(args[0]);
 		if(owner == null) {
 			msg("<c>%s <b>is not a valid mana owner",args[0]);
 			return false;

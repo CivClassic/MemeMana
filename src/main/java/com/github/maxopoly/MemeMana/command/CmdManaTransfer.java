@@ -21,7 +21,7 @@ public class CmdManaTransfer extends PlayerCommand {
 		super(name);
 		setIdentifier("manatransfer");
 		setDescription("Transfer some of your mana to someone else");
-		setUsage("/manatransfer Player Amount");
+		setUsage("/manatransfer Owner Amount");
 		setArguments(2,2);
 	}
 
@@ -31,9 +31,9 @@ public class CmdManaTransfer extends PlayerCommand {
 			return true;
 		}
 		Player player = (Player) sender;
-		Integer transferTo = MemeManaOwnerManager.fromPlayerName(args[0]);
+		Integer transferTo = MemeManaOwnerManager.fromName(args[0]);
 		if (transferTo == null) {
-			msg("<c>%s <b>is not a valid player",args[0]);
+			msg("<c>%s <b>is not a valid mana owner",args[0]);
 			return false;
 		}
 		

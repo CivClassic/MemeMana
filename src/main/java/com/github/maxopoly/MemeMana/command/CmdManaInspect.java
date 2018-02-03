@@ -22,13 +22,13 @@ public class CmdManaInspect extends PlayerCommand {
 	public CmdManaInspect(String name) {
 		super(name);
 		setIdentifier("manainspect");
-		setDescription("Inspect a player's mana");
-		setUsage("/manainspect Player");
+		setDescription("Inspect someone's mana");
+		setUsage("/manainspect Owner");
 		setArguments(1,1);
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		Integer owner = MemeManaOwnerManager.fromPlayerName(args[0]);
+		Integer owner = MemeManaOwnerManager.fromName(args[0]);
 		if(owner == null) {
 			msg("<c>%s <b>is not a valid mana owner",args[0]);
 			return false;
