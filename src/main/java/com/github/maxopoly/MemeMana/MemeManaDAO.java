@@ -194,6 +194,7 @@ public class MemeManaDAO extends ManagedDatasource {
 						.prepareStatement("select id, baseAmount, fillGrade, date, ownerId from manaUnits order by ownerId, date;");
 				ResultSet rs = getManaPouches.executeQuery();) {
 			while(rs.next()) {
+				pouches.putIfAbsent(rs.getInt(5), new MemeManaPouch());
 				pouches.get(rs.getInt(5)).addNewUnit(new MemeManaUnit(rs.getInt(1),rs.getDouble(2),rs.getTimestamp(4).getTime(),rs.getDouble(3)));
 			}
 		} catch (SQLException e) {
