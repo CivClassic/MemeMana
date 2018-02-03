@@ -6,7 +6,7 @@ public class MemeManaCommandHandler extends CommandHandler{
 	@Override
 	public void registerCommands() {
 		addCommands(new CmdManaInspect("CmdManaInspect"));
-		addCommands(new CmdManaGive("CmdManaGive"));
+		addCommands(new CmdManaIncrease("CmdManaIncrease"));
 		addCommands(new CmdManaReset("CmdManaReset"));
 		addCommands(new CmdManaShow("CmdManaShow"));
 		addCommands(new CmdManaRefill("CmdManaRefill"));

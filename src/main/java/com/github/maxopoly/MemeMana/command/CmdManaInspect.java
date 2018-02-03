@@ -16,8 +16,10 @@ import java.util.UUID;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
+import java.text.DecimalFormat;
 
 public class CmdManaInspect extends PlayerCommand {
+	private static final DecimalFormat manaFormat = new DecimalFormat("####.###");
 	public CmdManaInspect(String name) {
 		super(name);
 		setIdentifier("manainspect");
@@ -27,22 +29,22 @@ public class CmdManaInspect extends PlayerCommand {
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[0]);
 		if(owner == null) {
-			msg("<c>%s <b>is not a valid mana owner",args[1]);
+			msg("<c>%s <b>is not a valid mana owner",args[0]);
 			return false;
 		}
 		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
 		double manaAvailable = pouch.getContent();
-		msg("<c>%s<i> has <g>%s<i> mana",args[1],String.valueOf(manaAvailable));
+		msg("<c>%s<i> has <g>%s<i> mana",args[0],manaFormat.format(manaAvailable));
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		if(stat.getStreak() != 0) {
-			msg("<c>%s<g> is on a <i>%d<g> day login streak",args[1],stat.getStreak());
+			msg("<c>%s<g> is on a <i>%d<g> day login streak",args[0],stat.getStreak());
 		}
 		return true;
 	}
 
 	public List <String> tabComplete(CommandSender sender, String [] args) {
-		return new LinkedList <String> (); //empty list
+		return null; // Defaults to players
 	}
 }

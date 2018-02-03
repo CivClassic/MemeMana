@@ -32,18 +32,18 @@ public class CmdManaTransfer extends PlayerCommand {
 			return true;
 		}
 		Player player = (Player) sender;
-		MemeManaOwner transferTo = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		MemeManaOwner transferTo = MemeManaPlayerOwner.fromPlayerName(args[0]);
 		if (transferTo == null) {
-			msg("<c>%s <b>is not a valid player",args[1]);
+			msg("<c>%s <b>is not a valid player",args[0]);
 			return false;
 		}
 		
 		int transferAmount = (int) MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player)).getContent();
 		if (args.length == 3) {
 			try {
-				transferAmount = Integer.parseInt(args[2]);
+				transferAmount = Integer.parseInt(args[1]);
 			} catch (Exception e) {
-				msg("<i>%s <b>is not a valid amount of mana",args[2]);
+				msg("<i>%s <b>is not a valid amount of mana",args[1]);
 				return false;
 			}
 		}
@@ -53,6 +53,6 @@ public class CmdManaTransfer extends PlayerCommand {
 	}
 
 	public List <String> tabComplete(CommandSender sender, String [] args) {
-		return new LinkedList <String> (); //empty list
+		return null; // Defaults to players
 	}
 }

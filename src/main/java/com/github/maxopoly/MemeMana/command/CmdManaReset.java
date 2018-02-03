@@ -27,19 +27,19 @@ public class CmdManaReset extends PlayerCommand {
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[1]);
+		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[0]);
 		if(owner == null) {
-			msg("<c>%s <b>is not a valid player",args[1]);
+			msg("<c>%s <b>is not a valid player",args[0]);
 			return false;
 		}
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		stat.reset();
 		MemeManaPlugin.getInstance().getDAO().updateManaStat(owner,stat);
-		msg("<g>Reset mana statistics for <c>%s",args[1]);
+		msg("<g>Reset mana statistics for <c>%s",args[0]);
 		return true;
 	}
 
 	public List <String> tabComplete(CommandSender sender, String [] args) {
-		return new LinkedList <String> (); //empty list
+		return null; // Defaults to players
 	}
 }
