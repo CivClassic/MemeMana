@@ -1,23 +1,23 @@
 package com.github.maxopoly.MemeMana.command;
 
-import vg.civcraft.mc.civmodcore.command.PlayerCommand;
-import vg.civcraft.mc.namelayer.NameAPI;
-import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
-import com.devotedmc.ExilePearl.PearlType;
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
-import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
+import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.command.CommandSender;
-import java.util.UUID;
-import java.util.List;
+import com.github.maxopoly.MemeMana.model.ManaGainStat;
+import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
+import com.github.maxopoly.MemeMana.MemeManaManager;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.IntFunction;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import com.civclassic.altmanager.AltManager;
+import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 
 public class CmdManaRefill extends PlayerCommand {
+	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
+	private static final MemeManaManager manaManager = MemeManaPlugin.getInstance().getManaManager();
 	public CmdManaRefill(String name) {
 		super(name);
 		setIdentifier("manarefill");
@@ -26,6 +26,7 @@ public class CmdManaRefill extends PlayerCommand {
 		setArguments(0,1);
 	}
 
+	@Override
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
 			msg("Can't refill from console");
@@ -44,7 +45,7 @@ public class CmdManaRefill extends PlayerCommand {
 			return true;
 		}
 		int repairPerUnitMana = MemeManaPlugin.getInstance().getManaConfig().getPearlRefillAmount(pearl.getPearlType());
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player));
+		MemeManaPouch pouch = manaManager.getPouch(MemeManaOwnerManager.fromPlayer(player));
 		double manaAvailable = pouch.getContent();
 		int healthBefore = pearl.getHealth();
 		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), (int)manaAvailable);
@@ -60,6 +61,7 @@ public class CmdManaRefill extends PlayerCommand {
 		return true;
 	}
 
+	@Override
 	public List <String> tabComplete(CommandSender sender, String [] args) {
 		return new LinkedList <String> (); //empty list
 	}

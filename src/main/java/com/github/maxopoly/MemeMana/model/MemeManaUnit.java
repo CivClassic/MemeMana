@@ -49,18 +49,15 @@ public class MemeManaUnit {
 		return originalAmount;
 	}
 
-	public void removeAmount(double amt) {
-		double maximumAtThisTime = originalAmount * getDecayMultiplier();
-		double percentage = amt / maximumAtThisTime;
-		this.fillGrade -= percentage;
-		MemeManaPlugin.getInstance().getDAO().drainManaUnit(this,fillGrade);
+	public void setFillGrade(double fillGrade) {
+		this.fillGrade = fillGrade;
 	}
 
 	public double getCurrentAmount() {
 		return getOriginalAmount() * getFillGrade() * getDecayMultiplier();
 	}
 
-	private double getDecayMultiplier() {
+	double getDecayMultiplier() {
 		MemeManaConfig config = MemeManaPlugin.getInstance().getManaConfig();
 		long currentTime = System.currentTimeMillis();
 		return Math.pow(config.getDecayMultiplier(), (currentTime - getGainTime()) / config.getManaDecayTime());

@@ -6,9 +6,8 @@ import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
@@ -29,7 +28,7 @@ public class CmdManaInspect extends PlayerCommand {
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayerName(args[0]);
+		Integer owner = MemeManaOwnerManager.fromPlayerName(args[0]);
 		if(owner == null) {
 			msg("<c>%s <b>is not a valid mana owner",args[0]);
 			return false;

@@ -1,7 +1,7 @@
 package com.github.maxopoly.MemeMana;
 
-import com.github.maxopoly.MemeMana.listener.LoginListener;
 import com.github.maxopoly.MemeMana.command.MemeManaCommandHandler;
+import com.github.maxopoly.MemeMana.listener.LoginListener;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 public class MemeManaPlugin extends ACivMod {
@@ -10,8 +10,9 @@ public class MemeManaPlugin extends ACivMod {
 
 	private MemeManaConfig config;
 	private PlayerActivityManager activityManager;
-	private MemeManaManager manaManager;
 	private MemeManaDAO dao;
+	private MemeManaOwnerManager ownerManager;
+	private MemeManaManager manaManager;
 
 	public static MemeManaPlugin getInstance() {
 		return instance;
@@ -24,8 +25,9 @@ public class MemeManaPlugin extends ACivMod {
 		config = new MemeManaConfig(this);
 		dao = config.setupDatabase();
 		dao.cleanseManaUnits();
+		activityManager = new PlayerActivityManager();
+		ownerManager = new MemeManaOwnerManager();
 		manaManager = new MemeManaManager();
-		activityManager = new PlayerActivityManager(manaManager);
 		registerListener();
 		// Register commands.
 		MemeManaCommandHandler handle = new MemeManaCommandHandler();
@@ -50,12 +52,15 @@ public class MemeManaPlugin extends ACivMod {
 		return activityManager;
 	}
 
-	public MemeManaManager getManaManager() {
-		return manaManager;
-	}
-
 	public MemeManaDAO getDAO() {
 		return dao;
 	}
 
+	public MemeManaOwnerManager getOwnerManager() {
+		return ownerManager;
+	}
+
+	public MemeManaManager getManaManager() {
+		return manaManager;
+	}
 }

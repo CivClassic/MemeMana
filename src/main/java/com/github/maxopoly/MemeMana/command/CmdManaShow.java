@@ -6,9 +6,8 @@ import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
@@ -33,7 +32,7 @@ public class CmdManaShow extends PlayerCommand {
 			msg("Can't show your own mana from console.");
 			return true;
 		}
-		MemeManaPlayerOwner owner = MemeManaPlayerOwner.fromPlayer((Player)sender);
+		int owner = MemeManaOwnerManager.fromPlayer((Player)sender);
 		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
 		double manaAvailable = pouch.getContent();
 		msg("<i>You have<g> %s<i> mana",manaFormat.format(manaAvailable));

@@ -6,9 +6,8 @@ import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaOwner;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaPlayerOwner;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
@@ -32,13 +31,13 @@ public class CmdManaTransfer extends PlayerCommand {
 			return true;
 		}
 		Player player = (Player) sender;
-		MemeManaOwner transferTo = MemeManaPlayerOwner.fromPlayerName(args[0]);
+		Integer transferTo = MemeManaOwnerManager.fromPlayerName(args[0]);
 		if (transferTo == null) {
 			msg("<c>%s <b>is not a valid player",args[0]);
 			return false;
 		}
 		
-		int transferAmount = (int) MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaPlayerOwner.fromPlayer(player)).getContent();
+		int transferAmount = (int) MemeManaPlugin.getInstance().getManaManager().getPouch(MemeManaOwnerManager.fromPlayer(player)).getContent();
 		if (args.length == 3) {
 			try {
 				transferAmount = Integer.parseInt(args[1]);
@@ -47,7 +46,7 @@ public class CmdManaTransfer extends PlayerCommand {
 				return false;
 			}
 		}
-		//if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaPlayerOwner.fromPlayer(player),transferTo,transferAmount)) {}
+		//if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaOwnerManager.fromPlayer(player),transferTo,transferAmount)) {}
 		msg("Sorry, mana transfer is not implemented yet");
 		return true;
 	}
