@@ -13,6 +13,9 @@ commands:
     manarefill:
         aliases: [mnr, mnf, manafill, refill]
         permission: mememana.public
+    manamaterialize:
+        aliases: [mnmat, mnw, manawithdraw]
+        permission: mememana.public
     manareset:
         permission: mememana.admin
     manainspect:

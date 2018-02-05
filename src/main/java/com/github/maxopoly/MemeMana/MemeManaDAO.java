@@ -83,11 +83,11 @@ public class MemeManaDAO extends ManagedDatasource {
 	 * Deletes a single mana unit from the database
 	 * @param unit ManaUnit to delete
 	 */
-	public void snipeManaUnit(MemeManaUnit unit) {
+	public void snipeManaUnit(int unit) {
 		try (Connection connection = getConnection();
 				PreparedStatement snipeManaUnit = connection
 						.prepareStatement("delete from manaUnits where id=?;")) {
-			snipeManaUnit.setInt(1, unit.getID());
+			snipeManaUnit.setInt(1, unit);
 			snipeManaUnit.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem sniping mana unit", e);

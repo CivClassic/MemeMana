@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.bukkit.inventory.ItemStack;
 
 public class MemeManaPouch {
 
@@ -37,6 +38,16 @@ public class MemeManaPouch {
 
 	public void addNewUnit(MemeManaUnit unit) {
 		units.add(unit);
+	}
+
+	public void removeUnitById(int manaId) {
+		Iterator<MemeManaUnit> iter = units.iterator();
+		while(iter.hasNext()){
+			MemeManaUnit unit = iter.next();
+			if(unit.getID() == manaId){
+				iter.remove();
+			}
+		}
 	}
 
 	public void sortManaChronologically() {
@@ -74,7 +85,7 @@ public class MemeManaPouch {
 			if (unit.getCurrentAmount() <= leftToRemove) {
 				leftToRemove -= unit.getCurrentAmount();
 				iter.remove();
-				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit);
+				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit.getID());
 			} else {
 				double maximumAtThisTime = unit.getOriginalAmount() * unit.getDecayMultiplier();
 				double percentage = leftToRemove / maximumAtThisTime;
@@ -85,4 +96,7 @@ public class MemeManaPouch {
 		return true;
 	}
 
+	public List<MemeManaUnit> getRawUnits(){
+		return units;
+	}
 }

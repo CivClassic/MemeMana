@@ -2,6 +2,13 @@ package com.github.maxopoly.MemeMana.model;
 
 import com.github.maxopoly.MemeMana.MemeManaConfig;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class MemeManaUnit {
 
@@ -61,5 +68,22 @@ public class MemeManaUnit {
 		MemeManaConfig config = MemeManaPlugin.getInstance().getManaConfig();
 		long currentTime = System.currentTimeMillis();
 		return Math.pow(config.getDecayMultiplier(), (currentTime - getGainTime()) / config.getManaDecayTime());
+	}
+
+	// True means include the date the mana was gained.
+	public ItemStack getItemStackRepr(boolean withDate){
+		ItemStack i = new ItemStack(Material.EYE_OF_ENDER,(int) getCurrentAmount());
+		ItemMeta meta = i.getItemMeta();
+		List<String> lore = meta.getLore();
+		if(lore == null){
+			lore = new ArrayList<String>();
+		}
+		lore.add("Mana");
+		if(withDate){
+			lore.add(new Date(gainTime).toString());
+		}
+		meta.setLore(lore);
+		i.setItemMeta(meta);
+		return i;
 	}
 }

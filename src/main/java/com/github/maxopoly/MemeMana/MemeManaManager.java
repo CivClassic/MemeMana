@@ -47,4 +47,9 @@ public class MemeManaManager {
 	public int getNextManaID() {
 		return nextManaId++;
 	}
+
+	public void removeManaUnitById(int ownerId, int manaId) {
+		getPouch(ownerId).removeUnitById(manaId);
+		MemeManaPlugin.getInstance().getDAO().snipeManaUnit(manaId);
+	}
 }
