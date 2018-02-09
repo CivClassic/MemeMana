@@ -18,7 +18,7 @@ public class MemeManaPouch {
 	private static final Map<Integer,MemeManaPouch> allPouchesByOwner = new HashMap<Integer,MemeManaPouch>();
 	// TreeMap to ensure chronological ordering by gain time
 	private TreeMap<Long,Double> units;
-	private final int ownerId;
+	public final int ownerId;
 
 	private MemeManaPouch(int ownerId) {
 		this(ownerId, new TreeMap<Long,Double>());
@@ -86,6 +86,7 @@ public class MemeManaPouch {
 				manaLeftInNextUnit = (manaInThisUnit - leftToRemove) / config.getDecayMultiplier(timestamp);
 				// Shouldn't be a concurrent modification because we are iterating over the keySet
 				units.replace(timestamp,manaLeftInNextUnit);
+				break;
 			}
 		}
 		// If we removed any full units
@@ -104,6 +105,7 @@ public class MemeManaPouch {
 	public TreeMap<Long,Double> getRawUnits(){
 		return units;
 	}
+
 /*
 	public List<MemeManaUnit> getUnits(){
 		return getRawUnits().keySet().stream().map(g -> new MemeManaUnit(ownerId,g)).collect(Collectors.toList());
@@ -118,12 +120,50 @@ public class MemeManaPouch {
 		dao.snipeManaUnit(ownerId, gainTime);
 	}
 
-	//TODO
 	// Must keep decay times correct
 	// true means successful
-	public boolean transferMana(int from, int to, double amount) {
-		MemeManaPouch fromPouch = MemeManaPouch.getPouch(from);
-		MemeManaPouch toPouch = MemeManaPouch.getPouch(to);
-		return false;
+	public boolean transferMana(MemeManaPouch toPouch, double amount) {
+	if(getManaContent() < amount){
+			return false;
+		}
+		TreeMap<Long,Double> otherPouchRaw = toPouch.getRawUnits();
+		double leftToRemove = amount;
+		Long lastTimestampRemoved = null;
+		Double manaLeftInNextUnit = null;
+		Iterator<Long> iter = units.keySet().iterator();
+		while(iter.hasNext() && leftToRemove > 0.0001f){
+			long timestamp = iter.next();
+			double decayMult = config.getDecayMultiplier(timestamp);
+			// More gets removed from older units because they are decayed more
+			double toRemoveTimeDeprecated = leftToRemove / decayMult;
+			double manaInThisUnit = units.get(timestamp);
+			if(manaInThisUnit <= toRemoveTimeDeprecated){
+				iter.remove();
+				otherPouchRaw.merge(timestamp,manaInThisUnit,(a,b) -> a + b);
+				lastTimestampRemoved = timestamp;
+				leftToRemove -= manaInThisUnit * decayMult;
+			} else {
+				manaLeftInNextUnit = manaInThisUnit - toRemoveTimeDeprecated;
+				// Shouldn't be a concurrent modification because we are iterating over the keySet
+				units.replace(timestamp,manaLeftInNextUnit);
+				otherPouchRaw.merge(timestamp,toRemoveTimeDeprecated,(a,b) -> a + b);
+				break;
+			}
+		}
+		// If we transfer any full units
+		if(lastTimestampRemoved != null){
+			// Also transfer them from the database
+			dao.transferUnitsUntil(ownerId, toPouch.ownerId, lastTimestampRemoved);
+		}
+		// If we partially transfer a unit
+		if(manaLeftInNextUnit != null){
+			// Safe because we hit this unit while looping
+			long partialTimestamp = units.higherKey(lastTimestampRemoved);
+			// Adjust the one in our pouch to be the left behind part
+			dao.adjustManaUnit(ownerId, partialTimestamp, manaLeftInNextUnit);
+			// leftToRemove is now the non-time-adjusted-amount in the other unit
+			dao.addManaUnit(leftToRemove / config.getDecayMultiplier(partialTimestamp), toPouch.ownerId, partialTimestamp);
+		}
+		return true;
 	}
 }

@@ -3,7 +3,6 @@ package com.github.maxopoly.MemeMana.command;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
-import com.github.maxopoly.MemeMana.MemeManaManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
 
 public class MemeManaMaterializeGUI {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
-	private static final MemeManaManager manaManager = MemeManaPlugin.getInstance().getManaManager();
 	private final UUID uuid;
 	private int currentPage;
 

@@ -6,7 +6,6 @@ import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
-import com.github.maxopoly.MemeMana.MemeManaManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.IntFunction;
@@ -17,7 +16,6 @@ import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 
 public class CmdManaRefill extends PlayerCommand {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
-	private static final MemeManaManager manaManager = MemeManaPlugin.getInstance().getManaManager();
 	public CmdManaRefill(String name) {
 		super(name);
 		setIdentifier("manarefill");

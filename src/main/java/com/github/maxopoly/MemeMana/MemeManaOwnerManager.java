@@ -10,7 +10,6 @@ import vg.civcraft.mc.namelayer.GroupManager;
 import com.civclassic.altmanager.AltManager;
 import org.bukkit.entity.Player;
 
-import com.github.maxopoly.MemeMana.model.MemeManaUnit;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 
 public class MemeManaOwnerManager {
