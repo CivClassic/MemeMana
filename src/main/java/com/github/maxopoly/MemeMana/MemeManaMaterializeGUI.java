@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+import java.time.Duration;
 import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import org.bukkit.Bukkit;
@@ -32,6 +35,10 @@ import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
 
 public class MemeManaMaterializeGUI {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
+	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+	static{
+		manaDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
 	private final UUID uuid;
 	private int currentPage;
 
@@ -117,14 +124,16 @@ public class MemeManaMaterializeGUI {
 		// Give them the version without a timestamp or amount indicator
 		ItemStack toGive = new ItemStack(Material.EYE_OF_ENDER);
 		ISUtils.setName(toGive,"Mana");
-		ISUtils.addLore(toGive,"This is a meme mana unit");
+		ISUtils.addLore(toGive,"This is a meme of mana");
 		ItemMap toGiveMap = new ItemMap();
-		int manaInUnit = (int) pouch.getUnitManaContent(timestamp);
+		int manaInUnit = (int) Math.ceil(pouch.getUnitManaContent(timestamp));
 		toGiveMap.addItemAmount(toGive,manaInUnit);
 		// Display the version with timestamp and amount indicator
 		ItemStack toShow = toGive.clone();
-		ISUtils.addLore(toShow,"Generated " + new Date(timestamp).toString());
-		ISUtils.addLore(toShow,"Mana: " + manaInUnit);
+		ISUtils.addLore(toGive,"Doesn't decay");
+		ISUtils.addLore(toShow,"Amount: " + manaInUnit);
+		Duration expiryDeltaTime = Duration.ofMillis(MemeManaPlugin.getInstance().getManaConfig().getManaRotTime() - (new Date().getTime() - timestamp));
+		ISUtils.addLore(toShow,"Expires in " + String.format("%dd and %dh",expiryDeltaTime.toDays(),expiryDeltaTime.toHours() % 24) + " [" + manaDateFormat.format(new Date(timestamp)) + "]");
 		return new Clickable(toShow) {
 			@Override
 			public void clicked(Player p) {
