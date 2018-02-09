@@ -2,17 +2,20 @@ package com.github.maxopoly.MemeMana.command;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaUnit;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.MemeManaManager;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.Date;
 import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
 
 import net.md_5.bungee.api.ChatColor;
@@ -47,23 +50,24 @@ public class MemeManaMaterializeGUI {
 		ClickableInventory.forceCloseInventory(p);
 		ClickableInventory ci = new ClickableInventory(54, "Mana inventory");
 		int ownerId = MemeManaOwnerManager.fromUUID(uuid);
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(ownerId);
-		List<MemeManaUnit> rawUnits = pouch.getRawUnits();
-		if (rawUnits.size() < 45 * currentPage) {
+		MemeManaPouch pouch = MemeManaPouch.getPouch(ownerId);
+		TreeMap<Long,Double> units = pouch.getRawUnits();
+		if (units.size() < 45 * currentPage) {
 			// would show an empty page, so go to previous
 			currentPage--;
 			showScreen();
 		}
-		if (rawUnits.size() == 0) {
+		if (units.size() == 0) {
 			//item to indicate that there is nothing to claim
 			ItemStack noClaim = new ItemStack(Material.BARRIER);
 			ISUtils.setName(noClaim, ChatColor.GOLD + "No mana available");
 			ISUtils.addLore(noClaim, ChatColor.RED + "You currently have no mana");
 			ci.setSlot(new DecorationStack(noClaim), 4);
 		} else {
-			for (int i = 45 * currentPage; i < 45 * (currentPage + 1) && i < rawUnits.size(); i++) {
-				ci.setSlot(createManaClickable(ownerId,rawUnits.get(i)), i - (45 * currentPage));
-			}
+			int nextSlot = 0;
+			for(long timestamp : units.keySet().stream().skip(45 * currentPage).limit(45).collect(Collectors.toList())){
+				ci.setSlot(createManaClickable(pouch,timestamp), nextSlot++);
+			};
 		}
 		// previous button
 		if (currentPage > 0) {
@@ -82,14 +86,14 @@ public class MemeManaMaterializeGUI {
 			ci.setSlot(baCl, 45);
 		}
 		// next button
-		if ((45 * (currentPage + 1)) <= rawUnits.size()) {
+		if ((45 * (currentPage + 1)) <= units.size()) {
 			ItemStack forward = new ItemStack(Material.ARROW);
 			ISUtils.setName(forward, ChatColor.GOLD + "Go to next page");
 			Clickable forCl = new Clickable(forward) {
 
 				@Override
 				public void clicked(Player arg0) {
-					if ((45 * (currentPage + 1)) <= rawUnits.size()) {
+					if ((45 * (currentPage + 1)) <= units.size()) {
 						currentPage++;
 					}
 					showScreen();
@@ -111,15 +115,25 @@ public class MemeManaMaterializeGUI {
 		ci.showInventory(p);
 	}
 
-	private Clickable createManaClickable(int ownerId,MemeManaUnit unit) {
-		ItemStack isRepr = unit.getItemStackRepr(false);
-		return new Clickable(unit.getItemStackRepr(true)) {
+	private Clickable createManaClickable(MemeManaPouch pouch, long timestamp) {
+		// Give them the version without a timestamp or amount indicator
+		ItemStack toGive = new ItemStack(Material.EYE_OF_ENDER);
+		ISUtils.setName(toGive,"Mana");
+		ISUtils.addLore(toGive,"This is a meme mana unit");
+		ItemMap toGiveMap = new ItemMap();
+		int manaInUnit = (int) pouch.getUnitManaContent(timestamp);
+		toGiveMap.addItemAmount(toGive,manaInUnit);
+		// Display the version with timestamp and amount indicator
+		ItemStack toShow = toGive.clone();
+		ISUtils.addLore(toShow,"Generated " + new Date(timestamp).toString());
+		ISUtils.addLore(toShow,"Mana: " + manaInUnit);
+		return new Clickable(toShow) {
 			@Override
 			public void clicked(Player p) {
 				PlayerInventory pInv = p.getInventory();
-				if (new ItemMap(isRepr).fitsIn(pInv)) {
-					manaManager.removeManaUnitById(ownerId,unit.getID());
-					pInv.addItem(isRepr);
+				if (toGiveMap.fitsIn(pInv)) {
+					pouch.deleteSpecificManaUnitByTimestamp(timestamp);
+					toGiveMap.getItemStackRepresentation().forEach(u -> pInv.addItem(u));
 				} else {
 					p.sendMessage(ChatColor.RED + "There is not enough space in your inventory");
 				}

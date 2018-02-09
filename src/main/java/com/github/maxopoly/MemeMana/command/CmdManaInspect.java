@@ -33,8 +33,7 @@ public class CmdManaInspect extends PlayerCommand {
 			msg("<c>%s <b>is not a valid mana owner",args[0]);
 			return false;
 		}
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
-		double manaAvailable = pouch.getContent();
+		double manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
 		msg("<c>%s<i> has <g>%s<i> mana",args[0],manaFormat.format(manaAvailable));
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		if(stat.getStreak() != 0) {

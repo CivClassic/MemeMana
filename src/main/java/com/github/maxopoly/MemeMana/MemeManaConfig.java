@@ -58,10 +58,11 @@ public class MemeManaConfig {
 	}
 
 	/**
-	 * @return The factory by which mana is reduced after the decay interval
+	 * @return The factor by which mana is reduced if it was generated at the timestamp gainTime
 	 */
-	public double getDecayMultiplier() {
-		return decayMultiplier;
+	public double getDecayMultiplier(long gainTime) {
+		long currentTime = System.currentTimeMillis();
+		return Math.pow(decayMultiplier, (double) (currentTime - gainTime) / manaDecayTime);
 	}
 
 	/**

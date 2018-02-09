@@ -1,89 +1,50 @@
 package com.github.maxopoly.MemeMana.model;
 
-import com.github.maxopoly.MemeMana.MemeManaConfig;
-import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
-
+// Having a MemeManaUnit guaruntees that it exists in the database.
 public class MemeManaUnit {
+  /*
+	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
+	public final int ownerId;
+	public final long gainTime;
 
-	private int id;
-	private double originalAmount;
-	private long gainTime;
-	private double fillGrade;
-
-	public MemeManaUnit(int id, double originalAmount, long gainTime, double fillGrade) {
-		this.id = id;
-		this.originalAmount = originalAmount;
+	private MemeManaUnit(int ownerId, long gainTime) {
+		this.ownerId = ownerId;
 		this.gainTime = gainTime;
-		this.fillGrade = fillGrade;
 	}
 
-	public MemeManaUnit(int id, double originalAmount) {
-		this(id, originalAmount, System.currentTimeMillis(), 1.0f);
+	public static MemeManaUnit createManaUnit(int ownerId, double amount, long gainTime){
+		dao.addManaUnit(ownerId, amount, gainTime);
+		return new MemeManaUnit(ownerId, gainTime);
 	}
 
-	/**
-	 * @return Timestamp of when the MemeMana was given out
-	 */
-	public long getGainTime() {
-		return gainTime;
+	// Gets the mana unit in question or creates an empty one if it doesn't exist
+	public static MemeManaUnit getManaUnit(int ownerId, long gainTime){
+		pouchesByOwner.putIfAbsent(ownerId, new TreeMap<Long,Double>());
+		TreeMap<Long,Double> thisPouch = pouchesByOwner.get(ownerId);
+		return thisPouch.containsKey(gainTime) ? new MemeManaUnit(ownerId,gainTime) : createManaUnit(ownerId, 0.0, gainTime);
 	}
 
-	/**
-	 * @return How full this unit is on a scale from 1.0 (full) to 0.0 (empty)
-	 */
-	public double getFillGrade() {
-		return fillGrade;
+	public static List<MemeManaUnit> getUnits(int ownerId){
+		return getRawUnits().keySet().stream().map(g -> new MemeManaUnit(ownerId,g)).collect(Collectors.toList());
 	}
 
-	/**
-	 * @return Unique mana unit id used in the data base
-	 */
-	public int getID() {
-		return id;
+	public static double getManaForOwner(int ownerId){
+		return getRawUnits(ownerId).values().stream().mapToDouble(u -> u.getCurrentAmount()).sum();
 	}
 
-	/**
-	 * @return Original amount that was given
-	 */
-	public double getOriginalAmount() {
-		return originalAmount;
+	public static void reloadFromDB(){
+		dao.loadManaPouches(pouchesByOwner);
 	}
 
-	public void setFillGrade(double fillGrade) {
-		this.fillGrade = fillGrade;
+	public double getManaContent(){
+		MemeManaPouch.getPouch(ownerId).get(gainTime);
 	}
 
-	public double getCurrentAmount() {
-		return getOriginalAmount() * getFillGrade() * getDecayMultiplier();
+	// Deletes this mana unit completely and irreversibly
+	// You should not attempt to use a deleted mana unit because it will NPE
+	public void deleteUnit(){
+		dao.snipeManaUnit(ownerId, gainTime);
+		pouchesByOwner.get(ownerId).remove(gainTime);
 	}
-
-	double getDecayMultiplier() {
-		MemeManaConfig config = MemeManaPlugin.getInstance().getManaConfig();
-		long currentTime = System.currentTimeMillis();
-		return Math.pow(config.getDecayMultiplier(), (currentTime - getGainTime()) / config.getManaDecayTime());
-	}
-
-	// True means include the date the mana was gained.
-	public ItemStack getItemStackRepr(boolean withDate){
-		ItemStack i = new ItemStack(Material.EYE_OF_ENDER,(int) getCurrentAmount());
-		ItemMeta meta = i.getItemMeta();
-		List<String> lore = meta.getLore();
-		if(lore == null){
-			lore = new ArrayList<String>();
-		}
-		lore.add("Mana");
-		if(withDate){
-			lore.add(new Date(gainTime).toString());
-		}
-		meta.setLore(lore);
-		i.setItemMeta(meta);
-		return i;
-	}
+	*/
 }

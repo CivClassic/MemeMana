@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
+import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.civclassic.altmanager.AltManager;
 import org.bukkit.Bukkit;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class PlayerActivityManager {
 	}
 
 	public void giveOutReward(UUID player, int amount) {
-		MemeManaPlugin.getInstance().getManaManager().addMana(MemeManaOwnerManager.fromUUID(player),amount);
+		MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player)).addMana(amount);
 		Bukkit.getPlayer(player).sendMessage("You got " + amount + " mana for logging in");
 	}
 }

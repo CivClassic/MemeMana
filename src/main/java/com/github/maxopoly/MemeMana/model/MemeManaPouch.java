@@ -1,102 +1,129 @@
 package com.github.maxopoly.MemeMana.model;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import java.util.ArrayList;
+import com.github.maxopoly.MemeMana.MemeManaConfig;
+import com.github.maxopoly.MemeMana.MemeManaDAO;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.HashMap;
 import org.bukkit.inventory.ItemStack;
 
 public class MemeManaPouch {
+	private static final MemeManaConfig config = MemeManaPlugin.getInstance().getManaConfig();
+	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
+	private static final Map<Integer,MemeManaPouch> allPouchesByOwner = new HashMap<Integer,MemeManaPouch>();
+	// TreeMap to ensure chronological ordering by gain time
+	private TreeMap<Long,Double> units;
+	private final int ownerId;
 
-	// chronologically ordered!
-	private List<MemeManaUnit> units;
+	private MemeManaPouch(int ownerId) {
+		this(ownerId, new TreeMap<Long,Double>());
+	}
 
-	public MemeManaPouch() {
-		this.units = new ArrayList<MemeManaUnit>();
+	private MemeManaPouch(int ownerId, TreeMap<Long,Double> units) {
+		this.ownerId = ownerId;
+		this.units = units;
 	}
 
 	/**
 	 * Removes mana past the maximum keep time
 	 */
-	public void cleanupPouch() {
-		Iterator<MemeManaUnit> iter = units.iterator();
+	private void cleanupPouch() {
 		long currentTime = System.currentTimeMillis();
-		long rotTime = MemeManaPlugin.getInstance().getManaConfig().getManaRotTime();
-		while (iter.hasNext()) {
-			MemeManaUnit unit = iter.next();
-			if (currentTime - unit.getGainTime() > rotTime) {
-				iter.remove();
-			} else {
-				// chronologic ordering in the list ensures that if one element isnt rot, all the ones afterwards wont
-				// be as well
-				break;
-			}
-		}
+		long rotTime = config.getManaRotTime();
+		long firstAcceptableTimestamp = currentTime - rotTime;
+		//units.headMap(firstAcceptableTimestamp).keySet().forEach(timestamp -> {
+			//dao.snipeManaUnit(ownerId,timestamp);
+		//});
+		units = new TreeMap(units.tailMap(firstAcceptableTimestamp));
 	}
 
-	public void addNewUnit(MemeManaUnit unit) {
-		units.add(unit);
+	public static MemeManaPouch getPouch(int owner) {
+		return Optional.ofNullable(allPouchesByOwner.get(owner)).orElseGet(() -> {
+			TreeMap<Long,Double> units = new TreeMap<Long,Double>();
+			dao.loadManaPouch(owner,units);
+			MemeManaPouch pouch = new MemeManaPouch(owner,units);
+			allPouchesByOwner.put(owner,pouch);
+			return pouch;
+		});
 	}
 
-	public void removeUnitById(int manaId) {
-		Iterator<MemeManaUnit> iter = units.iterator();
-		while(iter.hasNext()){
-			MemeManaUnit unit = iter.next();
-			if(unit.getID() == manaId){
-				iter.remove();
-			}
-		}
-	}
-
-	public void sortManaChronologically() {
-		units.sort(Comparator.comparing(MemeManaUnit::getGainTime));
+	public void addMana(double amt) {
+		long gainTime = new Date().getTime();
+		dao.addManaUnit(amt, ownerId, gainTime);
+		units.put(gainTime,amt);
 	}
 
 	/**
 	 * @return How much mana is currently in this pouch
 	 */
-	public double getContent() {
-		double sum = 0;
+	public double getManaContent() {
 		cleanupPouch();
-		for (MemeManaUnit unit : units) {
-			sum += unit.getCurrentAmount();
-		}
-		return sum;
+		return units.values().stream().mapToDouble(m -> m).sum();
 	}
 
-	/**
-	 * Attempts to remove the given amount from this pouch, deleting it permanently
-	 *
-	 * @param amount
-	 *            Amount to remove
-	 * @return True if successfull, false if not
-	 */
-	public boolean deposit(double amount) {
-		if (getContent() < amount) {
+	// Returns true if there was enough mana, false if no mana was removed
+	public boolean removeMana(double amount) {
+		if(getManaContent() < amount){
 			return false;
 		}
-		List <MemeManaUnit> units = new LinkedList<MemeManaUnit>();
 		double leftToRemove = amount;
-		Iterator<MemeManaUnit> iter = units.iterator();
-		while (iter.hasNext() && leftToRemove > 0.0001f) {
-			MemeManaUnit unit = iter.next();
-			if (unit.getCurrentAmount() <= leftToRemove) {
-				leftToRemove -= unit.getCurrentAmount();
+		Long lastTimestampRemoved = null;
+		Double manaLeftInNextUnit = null;
+		Iterator<Long> iter = units.keySet().iterator();
+		while(iter.hasNext() && leftToRemove > 0.0001f){
+			long timestamp = iter.next();
+			double manaInThisUnit = getUnitManaContent(timestamp);
+			if(manaInThisUnit <= leftToRemove){
 				iter.remove();
-				MemeManaPlugin.getInstance().getDAO().snipeManaUnit(unit.getID());
+				lastTimestampRemoved = timestamp;
+				leftToRemove -= manaInThisUnit;
 			} else {
-				double maximumAtThisTime = unit.getOriginalAmount() * unit.getDecayMultiplier();
-				double percentage = leftToRemove / maximumAtThisTime;
-				unit.setFillGrade(unit.getFillGrade() - percentage);
-				break;
+				manaLeftInNextUnit = (manaInThisUnit - leftToRemove) / config.getDecayMultiplier(timestamp);
+				// Shouldn't be a concurrent modification because we are iterating over the keySet
+				units.replace(timestamp,manaLeftInNextUnit);
 			}
+		}
+		// If we removed any full units
+		if(lastTimestampRemoved != null){
+			// Also remove them from the database
+			dao.deleteUnitsUntil(ownerId, lastTimestampRemoved);
+		}
+		// If we partially depleted a unit
+		if(manaLeftInNextUnit != null){
+			// Also deplete in the database
+			dao.adjustManaUnit(ownerId, units.higherKey(lastTimestampRemoved), manaLeftInNextUnit);
 		}
 		return true;
 	}
 
-	public List<MemeManaUnit> getRawUnits(){
+	public TreeMap<Long,Double> getRawUnits(){
 		return units;
+	}
+/*
+	public List<MemeManaUnit> getUnits(){
+		return getRawUnits().keySet().stream().map(g -> new MemeManaUnit(ownerId,g)).collect(Collectors.toList());
+	}
+*/
+	public double getUnitManaContent(long gainTime){
+		return units.get(gainTime) * config.getDecayMultiplier(gainTime);
+	}
+
+	public void deleteSpecificManaUnitByTimestamp(long gainTime){
+		units.remove(gainTime);
+		dao.snipeManaUnit(ownerId, gainTime);
+	}
+
+	//TODO
+	// Must keep decay times correct
+	// true means successful
+	public boolean transferMana(int from, int to, double amount) {
+		MemeManaPouch fromPouch = MemeManaPouch.getPouch(from);
+		MemeManaPouch toPouch = MemeManaPouch.getPouch(to);
+		return false;
 	}
 }

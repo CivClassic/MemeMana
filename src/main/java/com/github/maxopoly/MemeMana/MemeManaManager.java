@@ -12,44 +12,37 @@ import com.github.maxopoly.MemeMana.model.MemeManaUnit;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 
 public class MemeManaManager {
-	private Map <Integer, MemeManaPouch> pouches;
-	private int nextManaId;
+/*
+	private Map<Integer, MemeManaPouch> pouches;
 
 	public MemeManaManager() {
 		reloadFromDatabase();
 	}
 
-	private void reloadFromDatabase() {
-		this.pouches = MemeManaPlugin.getInstance().getDAO().loadManaPouches();
-		this.nextManaId = MemeManaPlugin.getInstance().getDAO().getNextManaId();
+	public static MemeManaUnit createManaUnit(int ownerId, double amount, long gainTime){
+		dao.addManaUnit(ownerId, amount, gainTime);
+		return new MemeManaUnit(ownerId, gainTime);
 	}
 
-	public MemeManaPouch getPouch(int internalId) {
-		pouches.putIfAbsent(internalId,new MemeManaPouch());
-		return pouches.get(internalId);
+	// Gets the mana unit in question or creates an empty one if it doesn't exist
+	public static MemeManaUnit getManaUnit(int ownerId, long gainTime){
+		pouchesByOwner.putIfAbsent(ownerId, new TreeMap<Long,Double>());
+		TreeMap<Long,Double> thisPouch = pouchesByOwner.get(ownerId);
+		return thisPouch.containsKey(gainTime) ? new MemeManaUnit(ownerId,gainTime) : createManaUnit(ownerId, 0.0, gainTime);
 	}
 
-	//TODO
-	// Must keep decay times correct
-	// true means successful
-	public boolean transferMana(Integer from, Integer to, double amount) {
-		MemeManaPouch fromPouch = getPouch(from);
-		MemeManaPouch toPouch = getPouch(to);
-		return false;
+	// The returned TreeMap backs the cache, so don't modify it
+	public static TreeMap<Long,Double> getRawUnits(int ownerId){
+		pouchesByOwner.putIfAbsent(ownerId, new TreeMap<Long,Double>());
+		return pouchesByOwner.get(ownerId);
 	}
 
-	public void addMana(Integer player, double amount) {
-		MemeManaUnit unit = new MemeManaUnit(getNextManaID(),amount);
-		getPouch(player).addNewUnit(unit);
-		MemeManaPlugin.getInstance().getDAO().addManaUnit(unit,player);
+	public static List<MemeManaUnit> getUnits(int ownerId){
+		return getRawUnits().keySet().stream().map(g -> new MemeManaUnit(ownerId,g)).collect(Collectors.toList());
 	}
 
-	public int getNextManaID() {
-		return nextManaId++;
+	public static double getManaForOwner(int ownerId){
+		return getRawUnits(ownerId).values().stream().mapToDouble(u -> u.getCurrentAmount()).sum();
 	}
-
-	public void removeManaUnitById(int ownerId, int manaId) {
-		getPouch(ownerId).removeUnitById(manaId);
-		MemeManaPlugin.getInstance().getDAO().snipeManaUnit(manaId);
-	}
+*/
 }

@@ -33,8 +33,7 @@ public class CmdManaShow extends PlayerCommand {
 			return true;
 		}
 		int owner = MemeManaOwnerManager.fromPlayer((Player)sender);
-		MemeManaPouch pouch = MemeManaPlugin.getInstance().getManaManager().getPouch(owner);
-		double manaAvailable = pouch.getContent();
+		double manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
 		msg("<i>You have<g> %s<i> mana",manaFormat.format(manaAvailable));
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		if(stat.getStreak() != 0) {

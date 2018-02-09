@@ -38,7 +38,7 @@ public class CmdManaIncrease extends PlayerCommand {
 			msg("<i>%s <b>is not a valid amount of mana",args[1]);
 			return false;
 		}
-		MemeManaPlugin.getInstance().getManaManager().addMana(owner,giveAmount);
+		MemeManaPouch.getPouch(owner).addMana(giveAmount);
 		msg("<g>Increased the mana of <c>%s <g>by<i> %d",args[0],giveAmount);
 		return true;
 	}

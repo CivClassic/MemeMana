@@ -45,15 +45,17 @@ public class CmdManaRefill extends PlayerCommand {
 			return true;
 		}
 		int repairPerUnitMana = MemeManaPlugin.getInstance().getManaConfig().getPearlRefillAmount(pearl.getPearlType());
-		MemeManaPouch pouch = manaManager.getPouch(MemeManaOwnerManager.fromPlayer(player));
-		double manaAvailable = pouch.getContent();
+		int owner = MemeManaOwnerManager.fromPlayer(player);
+		MemeManaPouch pouch = MemeManaPouch.getPouch(owner);
+		double manaAvailable = pouch.getManaContent();
 		int healthBefore = pearl.getHealth();
 		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), (int)manaAvailable);
 		if(manaToUse <= 0) {
 			msg("<b>You don't have enough mana to refill this pearl at all");
 			return true;
 		}
-		if(pouch.deposit(manaToUse)) {
+		// TODO: This is very very very broken (doesn't actually remove the mana lol)
+		if(pouch.removeMana(manaToUse)) {
 			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
 			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
 			msg("<g>The pearl was repaired from <i>%d%%<g> health to <i>%d%%<g> health, consuming <i>%d<g> mana!", toPercent.apply(healthBefore),toPercent.apply(pearl.getHealth()),manaToUse);
