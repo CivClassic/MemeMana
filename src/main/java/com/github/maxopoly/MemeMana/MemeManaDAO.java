@@ -105,7 +105,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void transferUnitsUntil(int oldOwnerId, int newOwnerId, long timestamp) {
 		try (Connection connection = getConnection();
 				PreparedStatement transferUnits = connection
-						.prepareStatement("update manaUnits set ownerId=? where ownerId=? and gainTime<?;")) {
+						.prepareStatement("update manaUnits set ownerId=? where ownerId=? and gainTime<=?;")) {
 			transferUnits.setInt(1, newOwnerId);
 			transferUnits.setInt(2, oldOwnerId);
 			transferUnits.setTimestamp(3, new Timestamp(timestamp));
@@ -119,7 +119,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void deleteUnitsUntil(int ownerId, long timestamp) {
 		try (Connection connection = getConnection();
 				PreparedStatement removePrevious = connection
-						.prepareStatement("delete from manaUnits where ownerId=? and gainTime<?;")) {
+						.prepareStatement("delete from manaUnits where ownerId=? and gainTime<=?;")) {
 			removePrevious.setInt(1, ownerId);
 			removePrevious.setTimestamp(2, new Timestamp(timestamp));
 			removePrevious.execute();

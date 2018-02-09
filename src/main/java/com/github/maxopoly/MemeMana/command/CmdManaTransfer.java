@@ -37,8 +37,9 @@ public class CmdManaTransfer extends PlayerCommand {
 			return false;
 		}
 		
-		int transferAmount = (int) MemeManaPouch.getPouch(MemeManaOwnerManager.fromPlayer(player)).getManaContent();
-		if (args.length == 3) {
+		MemeManaPouch fromPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromPlayer(player));
+		int transferAmount = (int) fromPouch.getManaContent();
+		if (args.length == 2) {
 			try {
 				transferAmount = Integer.parseInt(args[1]);
 			} catch (Exception e) {
@@ -46,8 +47,11 @@ public class CmdManaTransfer extends PlayerCommand {
 				return false;
 			}
 		}
-		//if (MemeManaPlugin.getInstance().getManaManager().transferMana(MemeManaOwnerManager.fromPlayer(player),transferTo,transferAmount)) {}
-		msg("Sorry, mana transfer is not implemented yet");
+		if (fromPouch.transferMana(MemeManaPouch.getPouch(transferTo),transferAmount)) {
+			msg("<g>You transferred <i>%s<g> mana to <i>%s","" + transferAmount,args[0]);
+			return true;
+		}
+		msg("<b>Mana transfer unsuccessful. Make sure you have enough mana available");
 		return true;
 	}
 

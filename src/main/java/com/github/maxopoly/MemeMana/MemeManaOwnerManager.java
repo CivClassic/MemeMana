@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -55,11 +56,11 @@ public class MemeManaOwnerManager {
 	}
 
 	public static int fromNameLayerGroup(Group grp) {
-		return grp == null ? null : MemeManaPlugin.getInstance().getOwnerManager().getOwnerByExternal(OwnerType.NAMELAYER_GROUP_OWNER,grp.getGroupId());
+		return MemeManaPlugin.getInstance().getOwnerManager().getOwnerByExternal(OwnerType.NAMELAYER_GROUP_OWNER,grp.getGroupId());
 	}
 
 	public static Integer fromNameLayerGroup(String grpName) {
-		return fromNameLayerGroup(GroupManager.getGroup(grpName));
+		return Optional.ofNullable(GroupManager.getGroup(grpName)).map(g -> fromNameLayerGroup(g)).orElse(null);
 	}
 
 	public static Integer fromName(String ownerName) {

@@ -63,7 +63,7 @@ public class MemeManaPouch {
 	 */
 	public double getManaContent() {
 		cleanupPouch();
-		return units.values().stream().mapToDouble(m -> m).sum();
+		return units.entrySet().stream().mapToDouble(e -> e.getValue() * config.getDecayMultiplier(e.getKey())).sum();
 	}
 
 	// Returns true if there was enough mana, false if no mana was removed
@@ -144,8 +144,6 @@ public class MemeManaPouch {
 				leftToRemove -= manaInThisUnit * decayMult;
 			} else {
 				manaLeftInNextUnit = manaInThisUnit - toRemoveTimeDeprecated;
-				// Shouldn't be a concurrent modification because we are iterating over the keySet
-				units.replace(timestamp,manaLeftInNextUnit);
 				otherPouchRaw.merge(timestamp,toRemoveTimeDeprecated,(a,b) -> a + b);
 				break;
 			}
@@ -157,8 +155,8 @@ public class MemeManaPouch {
 		}
 		// If we partially transfer a unit
 		if(manaLeftInNextUnit != null){
-			// Safe because we hit this unit while looping
-			long partialTimestamp = units.higherKey(lastTimestampRemoved);
+			long partialTimestamp = Optional.ofNullable(lastTimestampRemoved).map(t -> units.higherKey(t)).orElse(units.firstKey());
+			units.replace(partialTimestamp,manaLeftInNextUnit);
 			// Adjust the one in our pouch to be the left behind part
 			dao.adjustManaUnit(ownerId, partialTimestamp, manaLeftInNextUnit);
 			// leftToRemove is now the non-time-adjusted-amount in the other unit
