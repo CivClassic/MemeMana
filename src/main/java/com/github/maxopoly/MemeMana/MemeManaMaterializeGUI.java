@@ -56,7 +56,7 @@ public class MemeManaMaterializeGUI {
 		ClickableInventory ci = new ClickableInventory(54, "Mana inventory");
 		int ownerId = MemeManaOwnerManager.fromUUID(uuid);
 		MemeManaPouch pouch = MemeManaPouch.getPouch(ownerId);
-		TreeMap<Long,Double> units = pouch.getRawUnits();
+		TreeMap<Long,Integer> units = pouch.getRawUnits();
 		if (units.size() < 45 * currentPage) {
 			// would show an empty page, so go to previous
 			currentPage--;
@@ -126,7 +126,7 @@ public class MemeManaMaterializeGUI {
 		ISUtils.setName(toGive,"Mana");
 		ISUtils.addLore(toGive,"This is a meme of mana");
 		ItemMap toGiveMap = new ItemMap();
-		int manaInUnit = (int) Math.ceil(pouch.getUnitManaContent(timestamp));
+		int manaInUnit = pouch.getUnitManaContent(timestamp);
 		toGiveMap.addItemAmount(toGive,manaInUnit);
 		// Display the version with timestamp and amount indicator
 		ItemStack toShow = toGive.clone();

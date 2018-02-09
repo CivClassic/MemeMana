@@ -17,14 +17,14 @@ public class MemeManaPouch {
 	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
 	private static final Map<Integer,MemeManaPouch> allPouchesByOwner = new HashMap<Integer,MemeManaPouch>();
 	// TreeMap to ensure chronological ordering by gain time
-	private TreeMap<Long,Double> units;
+	private TreeMap<Long,Integer> units;
 	public final int ownerId;
 
 	private MemeManaPouch(int ownerId) {
-		this(ownerId, new TreeMap<Long,Double>());
+		this(ownerId, new TreeMap<Long,Integer>());
 	}
 
-	private MemeManaPouch(int ownerId, TreeMap<Long,Double> units) {
+	private MemeManaPouch(int ownerId, TreeMap<Long,Integer> units) {
 		this.ownerId = ownerId;
 		this.units = units;
 	}
@@ -44,7 +44,7 @@ public class MemeManaPouch {
 
 	public static MemeManaPouch getPouch(int owner) {
 		return Optional.ofNullable(allPouchesByOwner.get(owner)).orElseGet(() -> {
-			TreeMap<Long,Double> units = new TreeMap<Long,Double>();
+			TreeMap<Long,Integer> units = new TreeMap<Long,Integer>();
 			dao.loadManaPouch(owner,units);
 			MemeManaPouch pouch = new MemeManaPouch(owner,units);
 			allPouchesByOwner.put(owner,pouch);
@@ -52,7 +52,7 @@ public class MemeManaPouch {
 		});
 	}
 
-	public void addMana(double amt) {
+	public void addMana(int amt) {
 		long gainTime = new Date().getTime();
 		dao.addManaUnit(amt, ownerId, gainTime);
 		units.put(gainTime,amt);
@@ -61,31 +61,29 @@ public class MemeManaPouch {
 	/**
 	 * @return How much mana is currently in this pouch
 	 */
-	public double getManaContent() {
+	public int getManaContent() {
 		cleanupPouch();
-		return units.entrySet().stream().mapToDouble(e -> e.getValue() * config.getDecayMultiplier(e.getKey())).sum();
+		return units.values().stream().mapToInt(e -> e).sum();
 	}
 
 	// Returns true if there was enough mana, false if no mana was removed
-	public boolean removeMana(double amount) {
+	public boolean removeMana(int amount) {
 		if(getManaContent() < amount){
 			return false;
 		}
-		double leftToRemove = amount;
+		int leftToRemove = amount;
 		Long lastTimestampRemoved = null;
-		Double manaLeftInNextUnit = null;
+		Integer manaLeftInNextUnit = null;
 		Iterator<Long> iter = units.keySet().iterator();
-		while(iter.hasNext() && leftToRemove > 0.0001f){
+		while(iter.hasNext() && leftToRemove > 0){
 			long timestamp = iter.next();
-			double manaInThisUnit = getUnitManaContent(timestamp);
+			int manaInThisUnit = units.get(timestamp);
 			if(manaInThisUnit <= leftToRemove){
 				iter.remove();
 				lastTimestampRemoved = timestamp;
 				leftToRemove -= manaInThisUnit;
 			} else {
-				manaLeftInNextUnit = (manaInThisUnit - leftToRemove) / config.getDecayMultiplier(timestamp);
-				// Shouldn't be a concurrent modification because we are iterating over the keySet
-				units.replace(timestamp,manaLeftInNextUnit);
+				manaLeftInNextUnit = manaInThisUnit - leftToRemove;
 				break;
 			}
 		}
@@ -96,13 +94,15 @@ public class MemeManaPouch {
 		}
 		// If we partially depleted a unit
 		if(manaLeftInNextUnit != null){
+			long partialTimestamp = Optional.ofNullable(lastTimestampRemoved).map(t -> units.higherKey(t)).orElse(units.firstKey());
+			units.replace(partialTimestamp,manaLeftInNextUnit);
 			// Also deplete in the database
-			dao.adjustManaUnit(ownerId, units.higherKey(lastTimestampRemoved), manaLeftInNextUnit);
+			dao.adjustManaUnit(ownerId, partialTimestamp, manaLeftInNextUnit);
 		}
 		return true;
 	}
 
-	public TreeMap<Long,Double> getRawUnits(){
+	public TreeMap<Long,Integer> getRawUnits(){
 		return units;
 	}
 
@@ -111,8 +111,8 @@ public class MemeManaPouch {
 		return getRawUnits().keySet().stream().map(g -> new MemeManaUnit(ownerId,g)).collect(Collectors.toList());
 	}
 */
-	public double getUnitManaContent(long gainTime){
-		return units.get(gainTime) * config.getDecayMultiplier(gainTime);
+	public int getUnitManaContent(long gainTime){
+		return units.get(gainTime);
 	}
 
 	public void deleteSpecificManaUnitByTimestamp(long gainTime){
@@ -122,29 +122,26 @@ public class MemeManaPouch {
 
 	// Must keep decay times correct
 	// true means successful
-	public boolean transferMana(MemeManaPouch toPouch, double amount) {
+	public boolean transferMana(MemeManaPouch toPouch, int amount) {
 	if(getManaContent() < amount){
 			return false;
 		}
-		TreeMap<Long,Double> otherPouchRaw = toPouch.getRawUnits();
-		double leftToRemove = amount;
+		TreeMap<Long,Integer> otherPouchRaw = toPouch.getRawUnits();
+		int leftToRemove = amount;
 		Long lastTimestampRemoved = null;
-		Double manaLeftInNextUnit = null;
+		Integer manaLeftInNextUnit = null;
 		Iterator<Long> iter = units.keySet().iterator();
-		while(iter.hasNext() && leftToRemove > 0.0001f){
+		while(iter.hasNext() && leftToRemove > 0){
 			long timestamp = iter.next();
-			double decayMult = config.getDecayMultiplier(timestamp);
-			// More gets removed from older units because they are decayed more
-			double toRemoveTimeDeprecated = leftToRemove / decayMult;
-			double manaInThisUnit = units.get(timestamp);
-			if(manaInThisUnit <= toRemoveTimeDeprecated){
+			int manaInThisUnit = units.get(timestamp);
+			if(manaInThisUnit <= leftToRemove){
 				iter.remove();
 				otherPouchRaw.merge(timestamp,manaInThisUnit,(a,b) -> a + b);
 				lastTimestampRemoved = timestamp;
-				leftToRemove -= manaInThisUnit * decayMult;
+				leftToRemove -= manaInThisUnit;
 			} else {
-				manaLeftInNextUnit = manaInThisUnit - toRemoveTimeDeprecated;
-				otherPouchRaw.merge(timestamp,toRemoveTimeDeprecated,(a,b) -> a + b);
+				manaLeftInNextUnit = manaInThisUnit - leftToRemove;
+				otherPouchRaw.merge(timestamp,leftToRemove,(a,b) -> a + b);
 				break;
 			}
 		}
@@ -159,8 +156,8 @@ public class MemeManaPouch {
 			units.replace(partialTimestamp,manaLeftInNextUnit);
 			// Adjust the one in our pouch to be the left behind part
 			dao.adjustManaUnit(ownerId, partialTimestamp, manaLeftInNextUnit);
-			// leftToRemove is now the non-time-adjusted-amount in the other unit
-			dao.addManaUnit(leftToRemove / config.getDecayMultiplier(partialTimestamp), toPouch.ownerId, partialTimestamp);
+			// leftToRemove is now the amount in the other unit
+			dao.addManaUnit(leftToRemove, toPouch.ownerId, partialTimestamp);
 		}
 		return true;
 	}

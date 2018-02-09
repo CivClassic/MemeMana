@@ -35,7 +35,7 @@ public class MemeManaDAO extends ManagedDatasource {
 				0,
 				false,
 				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType tinyint not null, primary key(foreignId,foreignIdType));",
-				"create table if not exists manaUnits (manaContent double not null,"
+				"create table if not exists manaUnits (manaContent int not null,"
 						+ "gainTime timestamp not null default now(), ownerId int not null references manaOwners(id), index `ownerIdIndex` (ownerId), primary key(ownerId,gainTime));",
 				"create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);");
 	}
@@ -59,11 +59,11 @@ public class MemeManaDAO extends ManagedDatasource {
 	/**
 	 * Adds a single mana unit, to the database. On duplicate, merges by adding mana contents
 	 */
-	public void addManaUnit(double manaContent, int owner, long timestamp) {
+	public void addManaUnit(int manaContent, int owner, long timestamp) {
 		try (Connection connection = getConnection();
 				PreparedStatement addManaUnit = connection
 						.prepareStatement("insert into manaUnits (manaContent, gainTime, ownerId) values (?,?,?) on duplicate key update gainTime = gainTime, ownerId = ownerId, manaContent = values(manaContent) + manaContent;")) {
-			addManaUnit.setDouble(1, manaContent);
+			addManaUnit.setInt(1, manaContent);
 			addManaUnit.setTimestamp(2, new Timestamp(timestamp));
 			addManaUnit.setInt(3, owner);
 			addManaUnit.execute();
@@ -89,11 +89,11 @@ public class MemeManaDAO extends ManagedDatasource {
 	}
 
 	// Adjust the mana content of a single unit
-	public void adjustManaUnit(int ownerId, long timestamp, double newManaContent) {
+	public void adjustManaUnit(int ownerId, long timestamp, int newManaContent) {
 		try (Connection connection = getConnection();
 				PreparedStatement updateManaUnit = connection
 						.prepareStatement("update manaUnits set manaContent=? where ownerId=? and gainTime=?;")) {
-			updateManaUnit.setDouble(1, newManaContent);
+			updateManaUnit.setInt(1, newManaContent);
 			updateManaUnit.setInt(2, ownerId);
 			updateManaUnit.setTimestamp(3, new Timestamp(timestamp));
 			updateManaUnit.execute();
@@ -176,14 +176,14 @@ public class MemeManaDAO extends ManagedDatasource {
 		}
 	}
 
-	public void loadManaPouch(int ownerId, Map<Long,Double> units) {
+	public void loadManaPouch(int ownerId, Map<Long,Integer> units) {
 		try (Connection connection = getConnection();
 				PreparedStatement getManaPouches = connection
 						.prepareStatement("select manaContent, gainTime from manaUnits where ownerId=? order by gainTime;");){
 			getManaPouches.setInt(1, ownerId);
 			ResultSet rs = getManaPouches.executeQuery();
 			while(rs.next()) {
-				units.put(rs.getTimestamp("gainTime").getTime(), rs.getDouble("manaContent"));
+				units.put(rs.getTimestamp("gainTime").getTime(), rs.getInt("manaContent"));
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem loading a mana pouch", e);

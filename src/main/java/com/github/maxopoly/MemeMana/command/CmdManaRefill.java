@@ -45,9 +45,9 @@ public class CmdManaRefill extends PlayerCommand {
 		int repairPerUnitMana = MemeManaPlugin.getInstance().getManaConfig().getPearlRefillAmount(pearl.getPearlType());
 		int owner = MemeManaOwnerManager.fromPlayer(player);
 		MemeManaPouch pouch = MemeManaPouch.getPouch(owner);
-		double manaAvailable = pouch.getManaContent();
+		int manaAvailable = pouch.getManaContent();
 		int healthBefore = pearl.getHealth();
-		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), (int)manaAvailable);
+		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaAvailable);
 		if(manaToUse <= 0) {
 			msg("<b>You don't have enough mana to refill this pearl at all");
 			return true;

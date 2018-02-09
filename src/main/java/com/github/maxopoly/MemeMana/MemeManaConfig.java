@@ -9,8 +9,6 @@ public class MemeManaConfig {
 	private MemeManaPlugin plugin;
 
 	private long manaRotTime;
-	private double decayMultiplier;
-	private long manaDecayTime;
 	private int maximumDailyMana;
 
 	public MemeManaConfig(MemeManaPlugin plugin) {
@@ -24,9 +22,6 @@ public class MemeManaConfig {
 		FileConfiguration config = plugin.getConfig();
 		// 90 day default
 		manaRotTime = config.getLong("manaRotTime", 90L * 24L * 60L * 60L * 1000L);
-		// 30 day default
-		manaDecayTime = config.getLong("manaDecayTime", 30L * 24L * 60L * 60L * 1000L);
-		decayMultiplier = config.getDouble("decayMultiplier", 0.5);
 		maximumDailyMana = config.getInt("maxDailyMana", 10);
 	}
 
@@ -55,21 +50,6 @@ public class MemeManaConfig {
 	 */
 	public long getManaRotTime() {
 		return manaRotTime;
-	}
-
-	/**
-	 * @return The factor by which mana is reduced if it was generated at the timestamp gainTime
-	 */
-	public double getDecayMultiplier(long gainTime) {
-		long currentTime = System.currentTimeMillis();
-		return Math.pow(decayMultiplier, (double) (currentTime - gainTime) / manaDecayTime);
-	}
-
-	/**
-	 * @return How many milliseconds it takes mana to progress through a decay stage
-	 */
-	public long getManaDecayTime() {
-		return manaDecayTime;
 	}
 
 	/**

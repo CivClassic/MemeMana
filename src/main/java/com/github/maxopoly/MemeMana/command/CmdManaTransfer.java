@@ -38,7 +38,7 @@ public class CmdManaTransfer extends PlayerCommand {
 		}
 		
 		MemeManaPouch fromPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromPlayer(player));
-		int transferAmount = (int) fromPouch.getManaContent();
+		int transferAmount = fromPouch.getManaContent();
 		if (args.length == 2) {
 			try {
 				transferAmount = Integer.parseInt(args[1]);

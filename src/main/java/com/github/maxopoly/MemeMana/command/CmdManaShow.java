@@ -18,7 +18,6 @@ import java.util.function.IntFunction;
 import java.text.DecimalFormat;
 
 public class CmdManaShow extends PlayerCommand {
-	private static final DecimalFormat manaFormat = new DecimalFormat("####.###");
 	public CmdManaShow(String name) {
 		super(name);
 		setIdentifier("manashow");
@@ -33,8 +32,8 @@ public class CmdManaShow extends PlayerCommand {
 			return true;
 		}
 		int owner = MemeManaOwnerManager.fromPlayer((Player)sender);
-		double manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
-		msg("<i>You have<g> %s<i> mana",manaFormat.format(manaAvailable));
+		int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
+		msg("<i>You have<g> %s<i> mana","" + manaAvailable);
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		if(stat.getStreak() != 0) {
 			msg("<g>You are on a <i>%d<g> day login streak",stat.getStreak());
