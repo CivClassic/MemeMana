@@ -62,7 +62,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void addManaUnit(double manaContent, int owner, long timestamp) {
 		try (Connection connection = getConnection();
 				PreparedStatement addManaUnit = connection
-						.prepareStatement("insert into manaUnits (manaContent, gainTime, ownerId) values (?,?,?,?) on duplicate key update gainTime = gainTime, ownerId = ownerId, manaContent = values(manaContent) + manaContent;")) {
+						.prepareStatement("insert into manaUnits (manaContent, gainTime, ownerId) values (?,?,?) on duplicate key update gainTime = gainTime, ownerId = ownerId, manaContent = values(manaContent) + manaContent;")) {
 			addManaUnit.setDouble(1, manaContent);
 			addManaUnit.setTimestamp(2, new Timestamp(timestamp));
 			addManaUnit.setInt(3, owner);
