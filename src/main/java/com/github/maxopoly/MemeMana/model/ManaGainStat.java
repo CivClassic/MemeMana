@@ -34,6 +34,7 @@ public class ManaGainStat {
 			lastDay = currentDay;
 			return true;
 		}
+		lastDay = currentDay;
 		streak = 1;
 		return true;
 	}
