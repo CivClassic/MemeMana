@@ -6,6 +6,7 @@ import com.civclassic.altmanager.AltManager;
 import org.bukkit.Bukkit;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Date;
 
 public class PlayerActivityManager {
 
@@ -29,6 +30,7 @@ public class PlayerActivityManager {
 	public void updatePlayer(UUID player) {
 		int owner = MemeManaOwnerManager.fromUUID(player);
 		ManaGainStat stat = getForPlayer(owner);
+		Bukkit.getPlayer(player).sendMessage("DEBUG MESSAGE: timeout is " + MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout() + ", lastDay is " + stat.getLastDay() + ", now is " + new Date().getTime());
 		if(stat.update()) {
 			MemeManaPlugin.getInstance().getDAO().updateManaStat(owner,stat);
 			giveOutReward(player,stat.getStreak());
