@@ -46,13 +46,21 @@ public class CmdManaRefill extends PlayerCommand {
 		int owner = MemeManaOwnerManager.fromPlayer(player);
 		MemeManaPouch pouch = MemeManaPouch.getPouch(owner);
 		int manaAvailable = pouch.getManaContent();
-		int healthBefore = pearl.getHealth();
-		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaAvailable);
-		if(manaToUse <= 0) {
-			msg("<b>You don't have enough mana to refill this pearl at all");
+		int manaToUse = pouch.getManaContent();
+		if (args.length == 1) {
+			try {
+				manaToUse = Integer.parseInt(args[0]);
+			} catch (Exception e) {
+				msg("<i>%s <b>is not a valid amount of mana",args[0]);
+				return false;
+			}
+		}
+		if(manaToUse > manaAvailable) {
+			msg("<b>You don't have that much mana");
 			return true;
 		}
-		// TODO: This is very very very broken (doesn't actually remove the mana lol)
+		int healthBefore = pearl.getHealth();
+		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaToUse);
 		if(pouch.removeMana(manaToUse)) {
 			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
 			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
