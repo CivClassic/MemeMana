@@ -9,6 +9,7 @@ public class MemeManaConfig {
 	private MemeManaPlugin plugin;
 
 	private long manaRotTime;
+	private long manaGainTimeout;
 	private int maximumDailyMana;
 
 	public MemeManaConfig(MemeManaPlugin plugin) {
@@ -22,6 +23,8 @@ public class MemeManaConfig {
 		FileConfiguration config = plugin.getConfig();
 		// 90 day default
 		manaRotTime = config.getLong("manaRotTime", 90L * 24L * 60L * 60L * 1000L);
+		// 22 hour default
+		manaGainTimeout = config.getLong("manaGainTimeout", 22L * 60L * 60L * 1000L);
 		maximumDailyMana = config.getInt("maxDailyMana", 10);
 	}
 
@@ -57,6 +60,13 @@ public class MemeManaConfig {
 	 */
 	public int getMaximumDailyMana() {
 		return maximumDailyMana;
+	}
+
+	/**
+	 * @return How long a player must wait between mana gains
+	 */
+	public long getManaGainTimeout() {
+		return manaGainTimeout;
 	}
 
 	/**

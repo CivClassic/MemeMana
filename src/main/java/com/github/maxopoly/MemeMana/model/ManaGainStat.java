@@ -21,19 +21,19 @@ public class ManaGainStat {
 	 * Updates the streak and last registered day. If the day has changed, meaning the stats were actually updated, true
 	 * will be returned, false otherwise
 	 *
-	 * @return True if the day has changed since the last check
+	 * @return True if they should get mana
 	 */
 	public boolean update() {
-		long currentDay = getDayFromTimeStamp(System.currentTimeMillis());
-		if (currentDay == lastDay) {
+		long currentDay = System.currentTimeMillis();
+		if (currentDay - lastDay < MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout()) {
 			return false;
 		}
-		if (currentDay == lastDay + 1) {
+		if (currentDay - lastDay < (MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout() * 2L)) {
 			streak = Math.min(streak + 1, MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana());
-		} else {
-			streak = 1;
+			lastDay = currentDay;
+			return true;
 		}
-		lastDay = currentDay;
+		streak = 1;
 		return true;
 	}
 
@@ -49,9 +49,4 @@ public class ManaGainStat {
 		this.streak = 0;
 		this.lastDay = 0;
 	}
-
-	public static long getDayFromTimeStamp(long timeStamp) {
-		return timeStamp / (24 * 60 * 60 * 1000);
-	}
-
 }

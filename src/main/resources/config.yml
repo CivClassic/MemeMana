@@ -9,8 +9,7 @@ mysql:
   idleTimout: 600000
   maxLifetime: 7200000
 manaRotTime: 7776000000 # Milliseconds in 90 days
-manaDecayTime: 2592000000 # Milliseconds in 30 days
-decayMultiplier: 0.5
+manaGainTimeout: 79200 # Milliseconds in 22 hours
 maximumDailyMana: 10
 pearlRefillAmount: 
   EXILE: 1
