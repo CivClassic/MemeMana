@@ -37,7 +37,7 @@ public class MemeManaDAO extends ManagedDatasource {
 				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType tinyint not null, primary key(foreignId,foreignIdType));",
 				"create table if not exists manaUnits (manaContent int not null,"
 						+ "gainTime timestamp not null default now(), ownerId int not null references manaOwners(id), index `ownerIdIndex` (ownerId), primary key(ownerId,gainTime));",
-				"create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay timestamp not null);");
+				"create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);");
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class MemeManaDAO extends ManagedDatasource {
 						.prepareStatement("replace into manaStats (ownerId, streak, lastDay) values(?,?,?);")) {
 			updateManaStat.setInt(1, owner);
 			updateManaStat.setInt(2, stat.getStreak());
-			updateManaStat.setTimestamp(3, new Timestamp(stat.getLastDay()));
+			updateManaStat.setLong(3, stat.getLastDay());
 			updateManaStat.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem updating mana stat", e);
@@ -211,7 +211,7 @@ public class MemeManaDAO extends ManagedDatasource {
 			ResultSet rs = getManaStats.executeQuery();
 			Map<Integer,ManaGainStat> out = new HashMap<Integer,ManaGainStat>();
 			while(rs.next()) {
-				out.put(rs.getInt(1),new ManaGainStat(rs.getInt(2),rs.getTimestamp(3).getTime()));
+				out.put(rs.getInt(1),new ManaGainStat(rs.getInt(2),rs.getLong(3)));
 			}
 			return out;
 		} catch (SQLException e) {

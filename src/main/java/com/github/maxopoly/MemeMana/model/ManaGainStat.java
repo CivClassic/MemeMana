@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana.model;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import java.util.Date;
 
 public class ManaGainStat {
 
@@ -9,7 +10,7 @@ public class ManaGainStat {
 
 	public ManaGainStat() {
 		this.streak = 0;
-		this.lastDay = 0;
+		this.lastDay = 0L;
 	}
 
 	public ManaGainStat(int streak, long lastDay) {
@@ -24,7 +25,7 @@ public class ManaGainStat {
 	 * @return True if they should get mana
 	 */
 	public boolean update() {
-		long currentDay = System.currentTimeMillis();
+		long currentDay = new Date().getTime();
 		if (currentDay - lastDay < MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout()) {
 			return false;
 		}
