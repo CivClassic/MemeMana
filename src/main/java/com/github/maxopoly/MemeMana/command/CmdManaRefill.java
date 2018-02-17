@@ -60,7 +60,7 @@ public class CmdManaRefill extends PlayerCommand {
 			return true;
 		}
 		int healthBefore = pearl.getHealth();
-		int manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaToUse);
+		manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaToUse);
 		if(pouch.removeMana(manaToUse)) {
 			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
 			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
