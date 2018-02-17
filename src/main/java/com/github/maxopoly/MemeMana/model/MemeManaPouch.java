@@ -36,10 +36,7 @@ public class MemeManaPouch {
 		long currentTime = System.currentTimeMillis();
 		long rotTime = config.getManaRotTime();
 		long firstAcceptableTimestamp = currentTime - rotTime;
-		//units.headMap(firstAcceptableTimestamp).keySet().forEach(timestamp -> {
-			//dao.snipeManaUnit(ownerId,timestamp);
-		//});
-		units = new TreeMap(units.tailMap(firstAcceptableTimestamp));
+		units = new TreeMap<Long,Integer>(units.tailMap(firstAcceptableTimestamp));
 	}
 
 	public static MemeManaPouch getPouch(int owner) {
@@ -106,11 +103,6 @@ public class MemeManaPouch {
 		return units;
 	}
 
-/*
-	public List<MemeManaUnit> getUnits(){
-		return getRawUnits().keySet().stream().map(g -> new MemeManaUnit(ownerId,g)).collect(Collectors.toList());
-	}
-*/
 	public int getUnitManaContent(long gainTime){
 		return units.get(gainTime);
 	}

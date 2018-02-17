@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.LinkedList;
 import vg.civcraft.mc.namelayer.group.Group;
 import vg.civcraft.mc.namelayer.GroupManager;
+import vg.civcraft.mc.namelayer.permission.PermissionType;
 
 public class CmdManaWithdraw extends PlayerCommand {
+	public static final String withdrawPermissionName = "MEMEMANA_WITHDRAW";
 	public CmdManaWithdraw(String name) {
 		super(name);
 		setIdentifier("manawithdraw");
@@ -48,6 +50,11 @@ public class CmdManaWithdraw extends PlayerCommand {
 				return false;
 			}
 		}
+		if(!NameAPI.getGroupManager().hasAccess(nlGroup, player.getUniqueId(), PermissionType.getPermission(withdrawPermissionName))){
+			msg("<b>You don't have permission to withdraw mana from <i>%s",args[0]);
+			return true;
+		}
+
 		if (fromPouch.transferMana(toPouch,transferAmount)) {
 			msg("<g>You withdrew <i>%s<g> mana from the group <i>%s","" + transferAmount,args[0]);
 			return true;
