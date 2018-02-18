@@ -75,4 +75,11 @@ public class MemeManaConfig {
 	public int getPearlRefillAmount(PearlType type) {
 		return plugin.getConfig().getInt("pearlRefillAmount." + type);
 	}
+
+	/**
+	 * @return How much it costs to upgrade Exile => Prison pearl
+	 */
+	public int getPearlUpgradeAmount() {
+		return plugin.getConfig().getInt("pearlUpgradeAmount");
+	}
 }

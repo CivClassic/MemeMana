@@ -19,6 +19,9 @@ commands:
     manawithdraw:
         aliases: [mnw]
         permission: mememana.public
+    manaupgrade:
+        aliases: [mnu]
+        permission: mememana.public
     manareset:
         permission: mememana.admin
     manainspect:

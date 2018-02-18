@@ -34,7 +34,7 @@ public class ManaGainStat {
 			lastDay = currentDay;
 			return true;
 		}
-		streak = Math.max(1,streak - (int) (currentDay - lastDay));
+		streak = Math.max(1,streak - (int) Math.min((long) MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana(),Math.max(0L,currentDay - lastDay)/MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout()));
 		lastDay = currentDay;
 		return true;
 	}

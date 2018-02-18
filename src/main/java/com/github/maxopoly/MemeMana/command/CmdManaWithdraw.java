@@ -24,8 +24,8 @@ public class CmdManaWithdraw extends PlayerCommand {
 		super(name);
 		setIdentifier("manawithdraw");
 		setDescription("Withdraw some mana from a namelayer group");
-		setUsage("/manawithdraw Group Amount");
-		setArguments(2,2);
+		setUsage("/manawithdraw <Group> [Amount]");
+		setArguments(1,2);
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
@@ -59,7 +59,7 @@ public class CmdManaWithdraw extends PlayerCommand {
 			msg("<g>You withdrew <i>%s<g> mana from the group <i>%s","" + transferAmount,args[0]);
 			return true;
 		}
-		msg("<b>Mana transfer unsuccessful. Make sure you have enough mana available");
+		msg("<b>Mana withdraw unsuccessful. Make sure you have enough mana in the group");
 		return true;
 	}
 

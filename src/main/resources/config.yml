@@ -14,3 +14,4 @@ maximumDailyMana: 10
 pearlRefillAmount: 
   EXILE: 1
   PRISON: 1
+pearlupgradeAmount: 10
