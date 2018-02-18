@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
 import java.text.DecimalFormat;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaShow extends PlayerCommand {
 	public CmdManaShow(String name) {
@@ -28,15 +29,15 @@ public class CmdManaShow extends PlayerCommand {
 
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
-			msg("Can't show your own mana from console.");
+			sender.sendMessage(ChatColor.RED + "Can't show your own mana from console.");
 			return true;
 		}
 		int owner = MemeManaOwnerManager.fromPlayer((Player)sender);
 		int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
-		msg("<i>You have<g> %s<i> mana","" + manaAvailable);
+		sender.sendMessage(ChatColor.YELLOW + "You have " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		if(stat.getStreak() != 0) {
-			msg("<g>You are on a <i>%d<g> day login streak",stat.getStreak());
+			sender.sendMessage(ChatColor.YELLOW + "You are on a " + ChatColor.LIGHT_PURPLE + stat.getStreak() + ChatColor.YELLOW + " day login streak");
 		}
 		return true;
 	}

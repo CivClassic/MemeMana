@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaReset extends PlayerCommand {
 	public CmdManaReset(String name) {
@@ -28,13 +29,13 @@ public class CmdManaReset extends PlayerCommand {
 	public boolean execute(CommandSender sender, String [] args) {
 		Integer owner = MemeManaOwnerManager.fromPlayerName(args[0]);
 		if(owner == null) {
-			msg("<c>%s <b>is not a valid player",args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid player");
 			return false;
 		}
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		stat.reset();
 		MemeManaPlugin.getInstance().getDAO().updateManaStat(owner,stat);
-		msg("<g>Reset mana statistics for <c>%s",args[0]);
+		sender.sendMessage(ChatColor.GREEN + "Reset mana statistics for " + ChatColor.AQUA + args[0]);
 		return true;
 	}
 

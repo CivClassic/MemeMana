@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
 import java.text.DecimalFormat;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaInspect extends PlayerCommand {
 	public CmdManaInspect(String name) {
@@ -29,14 +30,14 @@ public class CmdManaInspect extends PlayerCommand {
 	public boolean execute(CommandSender sender, String [] args) {
 		Integer owner = MemeManaOwnerManager.fromName(args[0]);
 		if(owner == null) {
-			msg("<c>%s <b>is not a valid mana owner",args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid mana owner");
 			return false;
 		}
 		int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
-		msg("<c>%s<i> has <g>%s<i> mana",args[0],"" + manaAvailable);
+		sender.sendMessage(ChatColor.AQUA + args[0] + ChatColor.YELLOW + " has " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
 		if(stat.getStreak() != 0) {
-			msg("<c>%s<g> is on a <i>%d<g> day login streak",args[0],stat.getStreak());
+			sender.sendMessage(ChatColor.AQUA + args[0] + ChatColor.YELLOW + " is on a " + ChatColor.LIGHT_PURPLE + stat.getStreak() + ChatColor.YELLOW + " day login streak");
 		}
 		return true;
 	}

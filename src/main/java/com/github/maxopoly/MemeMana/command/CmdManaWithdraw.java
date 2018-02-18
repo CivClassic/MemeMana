@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import vg.civcraft.mc.namelayer.group.Group;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.permission.PermissionType;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaWithdraw extends PlayerCommand {
 	public static final String withdrawPermissionName = "MEMEMANA_WITHDRAW";
@@ -30,14 +31,14 @@ public class CmdManaWithdraw extends PlayerCommand {
 
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
-			msg("Can't withdraw mana from console");
+			sender.sendMessage(ChatColor.RED + "Can't withdraw mana from console");
 			return true;
 		}
 		Player player = (Player) sender;
 		MemeManaPouch toPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromPlayer(player));
 		Group nlGroup = GroupManager.getGroup(args[0]);
 		if(nlGroup == null){
-			msg("<c>%s <b>is not a valid namelayer group",args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid NameLayer group");
 			return false;
 		}
 		MemeManaPouch fromPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromNameLayerGroup(nlGroup));
@@ -46,20 +47,20 @@ public class CmdManaWithdraw extends PlayerCommand {
 			try {
 				transferAmount = Integer.parseInt(args[1]);
 			} catch (Exception e) {
-				msg("<i>%s <b>is not a valid amount of mana",args[1]);
+				sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
 				return false;
 			}
 		}
 		if(!NameAPI.getGroupManager().hasAccess(nlGroup, player.getUniqueId(), PermissionType.getPermission(withdrawPermissionName))){
-			msg("<b>You don't have permission to withdraw mana from <i>%s",args[0]);
+			sender.sendMessage(ChatColor.RED + "You don't have permission to withdraw mana from " + ChatColor.AQUA + args[0]);
 			return true;
 		}
 
 		if (fromPouch.transferMana(toPouch,transferAmount)) {
-			msg("<g>You withdrew <i>%s<g> mana from the group <i>%s","" + transferAmount,args[0]);
+			sender.sendMessage(ChatColor.GREEN + "You withdrew " + ChatColor.GOLD + transferAmount + " mana from the group " + ChatColor.AQUA + args[0]);
 			return true;
 		}
-		msg("<b>Mana withdraw unsuccessful. Make sure you have enough mana in the group");
+		sender.sendMessage(ChatColor.RED + "Mana withdraw unsuccessful; Make sure you have enough mana in the group");
 		return true;
 	}
 

@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaIncrease extends PlayerCommand {
 	public CmdManaIncrease(String name) {
@@ -28,18 +29,18 @@ public class CmdManaIncrease extends PlayerCommand {
 	public boolean execute(CommandSender sender, String [] args) {
 		Integer owner = MemeManaOwnerManager.fromName(args[0]);
 		if(owner == null) {
-			msg("<c>%s <b>is not a valid mana owner",args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid mana owner");
 			return false;
 		}
 		Integer giveAmount = null;
 		try {
 			giveAmount = Integer.parseInt(args[1]);
 		} catch (Exception e) {
-			msg("<i>%s <b>is not a valid amount of mana",args[1]);
+			sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
 			return false;
 		}
 		MemeManaPouch.getPouch(owner).addMana(giveAmount);
-		msg("<g>Increased the mana of <c>%s <g>by<i> %d",args[0],giveAmount);
+		sender.sendMessage(ChatColor.GREEN + "Increased the mana of " + ChatColor.AQUA + args[0] + ChatColor.GREEN + " by " + ChatColor.GOLD + giveAmount);
 		return true;
 	}
 

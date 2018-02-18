@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.civclassic.altmanager.AltManager;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaMaterialize extends PlayerCommand {
 	public CmdManaMaterialize(String name) {
@@ -23,7 +24,7 @@ public class CmdManaMaterialize extends PlayerCommand {
 	@Override
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
-			msg("Can't refill from console");
+			sender.sendMessage(ChatColor.RED + "Can't materialize from console");
 			return true;
 		}
 		MemeManaMaterializeGUI gui = new MemeManaMaterializeGUI(((Player) sender).getUniqueId());

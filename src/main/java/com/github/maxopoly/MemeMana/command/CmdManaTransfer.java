@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
+import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaTransfer extends PlayerCommand {
 	public CmdManaTransfer(String name) {
@@ -27,13 +28,13 @@ public class CmdManaTransfer extends PlayerCommand {
 
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
-			msg("Can't transfer mana from console");
+			sender.sendMessage(ChatColor.RED + "Can't transfer mana from console");
 			return true;
 		}
 		Player player = (Player) sender;
 		Integer transferTo = MemeManaOwnerManager.fromName(args[0]);
 		if (transferTo == null) {
-			msg("<c>%s <b>is not a valid mana owner",args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid mana owner");
 			return false;
 		}
 		
@@ -43,15 +44,15 @@ public class CmdManaTransfer extends PlayerCommand {
 			try {
 				transferAmount = Integer.parseInt(args[1]);
 			} catch (Exception e) {
-				msg("<i>%s <b>is not a valid amount of mana",args[1]);
+				sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
 				return false;
 			}
 		}
 		if (fromPouch.transferMana(MemeManaPouch.getPouch(transferTo),transferAmount)) {
-			msg("<g>You transferred <i>%s<g> mana to <i>%s","" + transferAmount,args[0]);
+			sender.sendMessage(ChatColor.GREEN + "You transferred " + ChatColor.AQUA + transferAmount + ChatColor.GREEN + " mana to " + ChatColor.AQUA + args[0]);
 			return true;
 		}
-		msg("<b>Mana transfer unsuccessful. Make sure you have enough mana available");
+		sender.sendMessage(ChatColor.RED + "Mana transfer unsuccessful; Make sure you have enough mana available");
 		return true;
 	}
 
