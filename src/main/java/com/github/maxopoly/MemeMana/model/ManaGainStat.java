@@ -34,8 +34,8 @@ public class ManaGainStat {
 			lastDay = currentDay;
 			return true;
 		}
+		streak = Math.max(1,streak - (int) (currentDay - lastDay));
 		lastDay = currentDay;
-		streak = 1;
 		return true;
 	}
 
