@@ -25,6 +25,8 @@ commands:
         permission: mememana.admin
     manaincrease:
         permission: mememana.admin
+    manasimulatelogin:
+        permission: mememana.admin
 permissions:
     mememana.public:
         default: true
