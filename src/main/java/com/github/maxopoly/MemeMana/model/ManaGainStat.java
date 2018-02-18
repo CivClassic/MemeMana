@@ -47,6 +47,10 @@ public class ManaGainStat {
 		return lastDay;
 	}
 
+	public long millisToNextGain() {
+		return MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout() - (new Date().getTime() - lastDay);
+	}
+
 	public void reset() {
 		this.streak = 0;
 		this.lastDay = 0;
