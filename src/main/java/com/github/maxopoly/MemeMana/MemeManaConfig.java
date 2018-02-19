@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 import com.devotedmc.ExilePearl.PearlType;
+import vg.civcraft.mc.civmodcore.util.ConfigParsing;
 
 public class MemeManaConfig {
 
@@ -21,10 +22,9 @@ public class MemeManaConfig {
 		plugin.saveDefaultConfig();
 		plugin.reloadConfig();
 		FileConfiguration config = plugin.getConfig();
-		// 90 day default
-		manaRotTime = config.getLong("manaRotTime", 90L * 24L * 60L * 60L * 1000L);
-		// 22 hour default
-		manaGainTimeout = config.getLong("manaGainTimeout", 22L * 60L * 60L * 1000L);
+		// 50 millis per tick
+		manaRotTime = ConfigParsing.parseTime(config.getString("manaRotTime", "90d")) * 50L;
+		manaGainTimeout = ConfigParsing.parseTime(config.getString("manaGainTimeout", "22h")) * 50L;
 		maximumDailyMana = config.getInt("maxDailyMana", 10);
 	}
 
