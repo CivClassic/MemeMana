@@ -26,7 +26,7 @@ public class MemeManaConfig {
 		// 50 millis per tick
 		manaRotTime = ConfigParsing.parseTime(config.getString("manaRotTime", "90d")) * 50L;
 		manaGainTimeout = ConfigParsing.parseTime(config.getString("manaGainTimeout", "22h")) * 50L;
-		manaWaitTime = ConfigParsing.parseTime(config.getString("manaWaitTime", "30s"));
+		manaWaitTime = ConfigParsing.parseTime(config.getString("manaWaitTime", "30m"));
 		maximumDailyMana = config.getInt("maxDailyMana", 10);
 	}
 
