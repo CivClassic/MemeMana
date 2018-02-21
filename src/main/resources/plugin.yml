@@ -1,0 +1,37 @@
+name: ${project.name}
+main: com.github.maxopoly.MemeMana.MemeManaPlugin
+author: Maxopoly
+version: ${project.version}
+depend: [CivModCore, AltManager, ExilePearl]
+commands:
+    manashow:
+        aliases: [mns, mana, showmana]
+        permission: mememana.public
+    manatransfer:
+        aliases: [mng,mngive,managive,givemana,mnt,mntransfer,transfermana]
+        permission: mememana.public
+    manarefill:
+        aliases: [mnr, mnf, manafill, refill]
+        permission: mememana.public
+    manamaterialize:
+        aliases: [mnmat]
+        permission: mememana.public
+    manawithdraw:
+        aliases: [mnw]
+        permission: mememana.public
+    manaupgrade:
+        aliases: [mnu]
+        permission: mememana.public
+    manareset:
+        permission: mememana.admin
+    manainspect:
+        permission: mememana.admin
+    manaincrease:
+        permission: mememana.admin
+    manasimulatelogin:
+        permission: mememana.admin
+permissions:
+    mememana.public:
+        default: true
+    mememana.admin:
+        default: op
