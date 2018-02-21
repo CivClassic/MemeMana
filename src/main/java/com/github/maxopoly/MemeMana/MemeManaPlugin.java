@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana;
 import com.github.maxopoly.MemeMana.command.MemeManaCommandHandler;
 import com.github.maxopoly.MemeMana.command.CmdManaWithdraw;
 import com.github.maxopoly.MemeMana.listener.LoginListener;
+import com.github.maxopoly.MemeMana.listener.PearlListener;
 import vg.civcraft.mc.civmodcore.ACivMod;
 import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.permission.PermissionType;
@@ -39,6 +40,7 @@ public class MemeManaPlugin extends ACivMod {
 
 	private void registerListener() {
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
+		getServer().getPluginManager().registerEvents(new PearlListener(), this);
 	}
 
 	// By default, admins and owners have access to take mana.
