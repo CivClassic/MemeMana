@@ -2,11 +2,13 @@ package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.civclassic.altmanager.AltManager;
 import org.bukkit.Bukkit;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Date;
+import net.md_5.bungee.api.ChatColor;
 
 public class PlayerActivityManager {
 
@@ -32,15 +34,16 @@ public class PlayerActivityManager {
 		ManaGainStat stat = getForPlayer(owner);
 		if(stat.update()) {
 			MemeManaPlugin.getInstance().getDAO().updateManaStat(owner,stat);
-			giveOutReward(player,stat.getStreak());
-		}
-		else {
-			Bukkit.getPlayer(player).sendMessage("You didn't get any mana");
+			if(ExilePearlPlugin.getApi().isPlayerExiled(player)){
+				giveOutReward(player,stat.getStreak());
+			}else{
+				Bukkit.getPlayer(player).sendMessage(ChatColor.GRAY + "You didn't get any mana because you are pearled");
+			}
 		}
 	}
 
 	public void giveOutReward(UUID player, int amount) {
 		MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player)).addMana(amount);
-		Bukkit.getPlayer(player).sendMessage("You got " + amount + " mana for logging in");
+		Bukkit.getPlayer(player).sendMessage(ChatColor.DARK_GREEN + "You got " + ChatColor.GOLD + amount + ChatColor.DARK_GREEN + " mana for logging in");
 	}
 }
