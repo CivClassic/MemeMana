@@ -13,15 +13,15 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class LoginListener implements Listener {
-
 	private static final Map<UUID,BukkitTask> giveManaTasks = new HashMap<UUID,BukkitTask>();
+
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent e) {
-		giveManaTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> MemeManaPlugin.getInstance().getActivityManager().updatePlayer(e.getPlayer().getUniqueId()),36000L)); // 30 minutes in ticks
+		giveManaTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> MemeManaPlugin.getInstance().getActivityManager().updatePlayer(e.getPlayer().getUniqueId()),MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime()));
 	}
 
 	@EventHandler
-	public void playerJoin(PlayerQuitEvent e) {
+	public void playerQuit(PlayerQuitEvent e) {
 		Optional.ofNullable(giveManaTasks.remove(e.getPlayer().getUniqueId())).ifPresent(BukkitTask::cancel);
 	}
 

@@ -10,6 +10,7 @@ mysql:
   maxLifetime: 7200000
 manaRotTime: 30d
 manaGainTimeout: 22h
+manaWaitTime: 30s
 maximumDailyMana: 10
 pearlRefillAmount: 
   EXILE: 1
