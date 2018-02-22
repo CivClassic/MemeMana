@@ -39,7 +39,7 @@ public class CmdManaIncrease extends PlayerCommand {
 			sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
 			return false;
 		}
-		MemeManaPouch.getPouch(owner).addMana(giveAmount);
+		MemeManaPouch.getPouch(owner).addMana(giveAmount, NameAPI.getUUID(args[0]));
 		sender.sendMessage(ChatColor.GREEN + "Increased the mana of " + ChatColor.AQUA + args[0] + ChatColor.GREEN + " by " + ChatColor.GOLD + giveAmount);
 		return true;
 	}

@@ -6,6 +6,7 @@ import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.civclassic.altmanager.AltManager;
@@ -27,7 +28,8 @@ public class CmdManaMaterialize extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "Can't materialize from console");
 			return true;
 		}
-		MemeManaMaterializeGUI gui = new MemeManaMaterializeGUI(((Player) sender).getUniqueId());
+		UUID player = ((Player) sender).getUniqueId();
+		MemeManaMaterializeGUI gui = new MemeManaMaterializeGUI(player,player,true);
 		gui.showScreen();
 		return true;
 	}
