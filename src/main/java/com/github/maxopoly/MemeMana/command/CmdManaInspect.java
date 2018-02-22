@@ -39,6 +39,10 @@ public class CmdManaInspect extends PlayerCommand {
 		if(stat.getStreak() != 0) {
 			sender.sendMessage(ChatColor.AQUA + args[0] + ChatColor.YELLOW + " is on a " + ChatColor.LIGHT_PURPLE + stat.getStreak() + ChatColor.YELLOW + " day login streak");
 		}
+		if(sender instanceof Player){
+			MemeManaMaterializeGUI gui = new MemeManaMaterializeGUI(((Player) sender).getUniqueId(),NameAPI.getUUID(args[0]),false);
+			gui.showScreen();
+		}
 		return true;
 	}
 

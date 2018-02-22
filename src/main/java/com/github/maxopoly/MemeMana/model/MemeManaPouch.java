@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.HashMap;
+import java.util.UUID;
 import org.bukkit.inventory.ItemStack;
 
 public class MemeManaPouch {
@@ -49,9 +50,9 @@ public class MemeManaPouch {
 		});
 	}
 
-	public void addMana(int amt) {
+	public void addMana(int amt, UUID creator) {
 		long gainTime = new Date().getTime();
-		dao.addManaUnit(amt, ownerId, gainTime);
+		dao.addManaUnit(amt, ownerId, gainTime, creator);
 		units.put(gainTime,amt);
 	}
 
@@ -115,7 +116,8 @@ public class MemeManaPouch {
 	// Must keep decay times correct
 	// true means successful
 	public boolean transferMana(MemeManaPouch toPouch, int amount) {
-	if(getManaContent() < amount){
+		dao.logManaTransfer(ownerId, toPouch.ownerId, amount);
+		if(getManaContent() < amount){
 			return false;
 		}
 		TreeMap<Long,Integer> otherPouchRaw = toPouch.getRawUnits();
@@ -149,7 +151,8 @@ public class MemeManaPouch {
 			// Adjust the one in our pouch to be the left behind part
 			dao.adjustManaUnit(ownerId, partialTimestamp, manaLeftInNextUnit);
 			// leftToRemove is now the amount in the other unit
-			dao.addManaUnit(leftToRemove, toPouch.ownerId, partialTimestamp);
+			dao.addManaUnit(leftToRemove, toPouch.ownerId, partialTimestamp, dao.getCreatorUUID(ownerId, partialTimestamp));
+			// Making two database accesses is fun :D
 		}
 		return true;
 	}

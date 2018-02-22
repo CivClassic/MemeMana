@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
@@ -36,8 +37,42 @@ public class MemeManaDAO extends ManagedDatasource {
 				false,
 				"create table if not exists manaOwners (id int auto_increment unique, foreignId int not null, foreignIdType tinyint not null, primary key(foreignId,foreignIdType));",
 				"create table if not exists manaUnits (manaContent int not null,"
-						+ "gainTime timestamp not null default now(), ownerId int not null references manaOwners(id), index `ownerIdIndex` (ownerId), primary key(ownerId,gainTime));",
-				"create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);");
+						+ "gainTime timestamp not null default now(), ownerId int not null references manaOwners(id), creator int not null references manaUUIDs(manaLogId), index `ownerIdIndex` (ownerId), primary key(ownerId,gainTime));",
+				"create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);",
+				"create table if not exists manaLog (logTime timestamp not null default now(), fromId int not null references manaOwners(id), toId int not null references manaOwners(id), manaAmount int not null, primary key(logTime,fromId,toId));",
+				"create table if not exists manaUseLog (logTime timestamp not null default now(), creator int not null references manaUUIDs(manaLogId), user int not null references manaUUIDs(manaLogId), pearled int not null references manaUUIDs(manaLogId), upgrade boolean not null, mana int not null, primary key(logTime,creator,user,pearled,upgrade));",
+				"create table if not exists manaUUIDs (manaLogId int not null auto_increment, manaLogUUID varchar(40) unique not null, primary key(manaLogId));");
+	}
+
+	public void logManaTransfer(int fromId, int toId, int manaAmount){
+		try (Connection connection = getConnection();
+				PreparedStatement ps = connection
+						.prepareStatement("insert into manaLog (fromId, toId, manaAmount) values (?,?,?) on duplicate key update logTime = logTime, fromId = fromId, toId = toId, manaAmount = values(manaAmount) + manaAmount;")) {
+			ps.setInt(1, fromId);
+			ps.setInt(2, toId);
+			ps.setInt(3, manaAmount);
+			ps.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem logging mana transfer", e);
+		}
+	}
+
+	public void logManaUse(UUID creator, UUID user, UUID pearled, int amount, boolean isUpgrade){
+		registerUUID(creator);
+		registerUUID(user);
+		registerUUID(pearled);
+		try (Connection connection = getConnection();
+				PreparedStatement ps = connection
+						.prepareStatement("insert into manaUseLog (creator, user, pearled, upgrade, mana) select c.manaLogId, u.manaLogId, p.manaLogId, ?, ? from m join manaUUIDs c on c.manaLogUUID = ? join manaUUIDs u on u.manaLogUUID = ? join manaUUIDs p on p.manaLogUUID = ?;")) {
+			ps.setBoolean(1, isUpgrade);
+			ps.setInt(2, amount);
+			ps.setString(3, creator.toString());
+			ps.setString(4, user.toString());
+			ps.setString(5, pearled.toString());
+			ps.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem logging mana use", e);
+		}
 	}
 
 	/**
@@ -56,16 +91,46 @@ public class MemeManaDAO extends ManagedDatasource {
 		}
 	}
 
+	public void registerUUID(UUID u) {
+		try (Connection connection = getConnection();
+				PreparedStatement getCreatorUUID = connection
+						.prepareStatement("insert into manaUUIDs (manaLogUUID) values (?) on duplicate key update manaLogUUID = manaLogUUID;")) {
+			getCreatorUUID.setString(1,u.toString());
+			getCreatorUUID.execute();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem registering UUID", e);
+		}
+	}
+
+	public UUID getCreatorUUID(int owner, long timestamp) {
+		try (Connection connection = getConnection();
+				PreparedStatement getCreatorUUID = connection
+						.prepareStatement("select manaLogUUID from manaUUIDs join manaUnits on manaUUIDs.manaLogId = manaUnits.creator where manaUnits.gainTime = ? and manaUnits.ownerId = ?;")) {
+			getCreatorUUID.setTimestamp(1,new Timestamp(timestamp));
+			getCreatorUUID.setInt(2,owner);
+			ResultSet rs = getCreatorUUID.executeQuery();
+			if(rs.first()){
+				return UUID.fromString(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting creator UUID", e);
+		}
+		return null;
+	}
+
 	/**
 	 * Adds a single mana unit, to the database. On duplicate, merges by adding mana contents
 	 */
-	public void addManaUnit(int manaContent, int owner, long timestamp) {
+	public void addManaUnit(int manaContent, int owner, long timestamp, UUID creator) {
+		registerUUID(creator);
 		try (Connection connection = getConnection();
 				PreparedStatement addManaUnit = connection
-						.prepareStatement("insert into manaUnits (manaContent, gainTime, ownerId) values (?,?,?) on duplicate key update gainTime = gainTime, ownerId = ownerId, manaContent = values(manaContent) + manaContent;")) {
+						.prepareStatement("insert into manaUnits (manaContent, gainTime, ownerId, creator) select ?, ?, ?, manaUUIDs.manaLogId from manaUUIDs where manaUUIDs.manaLogUUID = ? on duplicate key update gainTime = manaUnits.gainTime, ownerId = manaUnits.ownerId, manaContent = ? + manaUnits.manaContent, creator = manaUnits.creator;")) {
 			addManaUnit.setInt(1, manaContent);
 			addManaUnit.setTimestamp(2, new Timestamp(timestamp));
 			addManaUnit.setInt(3, owner);
+			addManaUnit.setString(4, creator.toString());
+			addManaUnit.setInt(5, manaContent);
 			addManaUnit.execute();
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem adding mana unit", e);
@@ -193,7 +258,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void updateManaStat(int owner, ManaGainStat stat) {
 		try (Connection connection = getConnection();
 				PreparedStatement updateManaStat = connection
-						.prepareStatement("replace into manaStats (ownerId, streak, lastDay) values(?,?,?);")) {
+						.prepareStatement("replace into manaStats (ownerId, streak, lastDay) values(?,?,?)")) {
 			updateManaStat.setInt(1, owner);
 			updateManaStat.setInt(2, stat.getStreak());
 			updateManaStat.setLong(3, stat.getLastDay());
