@@ -60,7 +60,7 @@ public class MemeManaDAO extends ManagedDatasource {
 		}
 	}
 
-	public void logManaUse(UUID creator, UUID user, UUID pearled, int amount, boolean isUpgrade){
+	public void logManaUse(UUID creator, UUID user, UUID pearled, int amount, boolean isUpgrade, long timestamp){
 		registerUUID(creator);
 		registerUUID(user);
 		registerUUID(pearled);
@@ -69,7 +69,7 @@ public class MemeManaDAO extends ManagedDatasource {
 						.prepareStatement("insert into manaUseLog (creator, user, pearled, upgrade, mana, logTime) select c.manaLogId, u.manaLogId, p.manaLogId, ?, ?, ? from manaUUIDs join manaUUIDs c on c.manaLogUUID = ? join manaUUIDs u on u.manaLogUUID = ? join manaUUIDs p on p.manaLogUUID = ? on duplicate key update creator = manaUseLog.creator, user = manaUseLog.user, pearled = manaUseLog.pearled, upgrade = manaUseLog.upgrade, mana = ? + manaUseLog.mana;")) {
 			ps.setBoolean(1, isUpgrade);
 			ps.setInt(2, amount);
-			ps.setLong(3, new Date().getTime());
+			ps.setLong(3, timestamp);
 			ps.setString(4, creator.toString());
 			ps.setString(5, user.toString());
 			ps.setString(6, pearled.toString());
@@ -87,7 +87,7 @@ public class MemeManaDAO extends ManagedDatasource {
 			getCreatorUUID.setString(1,pearled.toString());
 			ResultSet rs = getCreatorUUID.executeQuery();
 			Stream.Builder<MemeManaUseLogEntry> b = Stream.builder();
-			while(rs.first()){
+			while(rs.next()){
 				b.accept(new MemeManaUseLogEntry(rs.getLong(1),UUID.fromString(rs.getString(2)),UUID.fromString(rs.getString(3)),UUID.fromString(rs.getString(4)),rs.getBoolean(5),rs.getInt(6)));
 			}
 			return b.build();

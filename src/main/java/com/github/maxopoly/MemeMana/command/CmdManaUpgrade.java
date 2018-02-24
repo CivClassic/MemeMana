@@ -10,6 +10,7 @@ import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Date;
 import java.util.function.IntFunction;
 import java.util.function.BiConsumer;
 import org.bukkit.command.CommandSender;
@@ -55,8 +56,9 @@ public class CmdManaUpgrade extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "Upgrading costs " + ChatColor.GOLD + pearlUpgradeCost + ChatColor.RED + " mana, but you only have " + ChatColor.GOLD + manaAvailable + ChatColor.RED + " mana");
 			return true;
 		}
+		long canonTimestamp = new Date().getTime();
 		BiConsumer<Long,Integer> logUsage = (l,a) -> {
-			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,true);
+			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,true,canonTimestamp);
 		};
 		if(pouch.removeMana(pearlUpgradeCost,logUsage)) {
 			pearl.setPearlType(PearlType.PRISON);
