@@ -21,13 +21,13 @@ You also need a significant amount of Mana to upgrade an Exile pearl to a Prison
 
 When you log in, you will get a message telling you how much Mana (if any) you got for logging in.
 You can check your total amount of Mana at any time by using `/manashow` or `/mns` for short.
-To refill a pearl, hold it in your hand and type `/manarefill` to refill it as much as possible, or `/manarefill Amount` to refill it using up to `Amount` Mana.
+To refill a pearl, hold it in your hand and type `/manarefill` or `/mnr` (or `/manafill` or `/mnf`) to refill it as much as possible, or `/manarefill Amount` to refill it using up to `Amount` Mana.
 
 To upgrade an Exile pearl to a Prison pearl, hold it in your hand, then use `/manaupgrade`.
 
 ## I don't have vault access. How do I give my Mana to the vault owner?
 
-Type `/manatransfer Someone Amount` to transfer `Amount` Mana to the player or NameLayer group `Someone`.
+Type `/manatransfer Someone Amount` or `/mnt` (or `/mngive` or `/mng`) to transfer `Amount` Mana to the player or NameLayer group `Someone`.
 If someone transfers Mana to a group you have the `MEMEMANA_WITHDRAW` permission on, use `/manawithdraw Group Amount` to move the Mana from the NameLayer group to your personal account.
 Then you can use `/manarefill` (see above) to refill pearls.
 
@@ -44,12 +44,20 @@ It is possible to set the ratio so that, for example, one active player's Mana i
 
 Your virtual Mana can be materialized into physical Mana, but **beware: physical Mana can't refuel pearls, and it can't be converted back into virtual Mana**.
 Physical Mana is currently useless, but it might have a use in the future, like converting it to XP, or using it as an instant payment system.
-That said, you can get physical Mana by typing `/manamaterialize` and then clicking on Mana to materialize it.
+That said, you can get physical Mana by typing `/manamaterialize` or `/mnmat` and then clicking on Mana to materialize it.
 
 ## I don't want to make a spreadsheet of all my login times. How do I check when my Mana will decay?
 
 Hovering over the Mana in your `/manamaterialize` GUI will give you detailed information about when it will decay.
 
+## I'm pearled and very very salty about it, and I want someone to blame. How do I figure out who is sponsoring my pearl?
+
+You can do `/manafuellog` or `/mnfl` to list all the times anyone has refueled or upgraded your pearl, including the person who originally recieved the mana for logging in.
+
 ## I'm an admin and I want to investigate someone's Mana without typing SQL queries. What do?
 
-`/manainspect <Player or Group>`
+`/manainspect <Player or Group>` to see their `/manamaterialize` thingy and their `/mns`, or `/manaviewtranslog <Player or Group>` or `/mnvtl` to see their transaction log.
+
+## I'm an admin and I want to verify that MemeMana is working correctly without waiting for the login timer. What do?
+
+`/manasimulatelogin` to simulate logging in, skipping the timer. If you just want some mana to play with, use `/manaincrease Player Amount`. You can also reset someone's streak using `/manareset Player`.
