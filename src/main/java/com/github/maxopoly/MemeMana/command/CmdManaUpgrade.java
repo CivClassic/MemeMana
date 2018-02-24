@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana.command;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
+import com.devotedmc.ExilePearl.util.SpawnUtil;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.MemeManaDAO;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
@@ -64,6 +65,10 @@ public class CmdManaUpgrade extends PlayerCommand {
 			pearl.setPearlType(PearlType.PRISON);
 			pearl.setHealth(ExilePearlPlugin.getApi().getPearlConfig().getPearlHealthStartValue());
 			sender.sendMessage(ChatColor.GREEN + "The pearl was successfully upgraded");
+			if(pearl.getPlayer() != null && pearl.getPlayer().isOnline()) {
+				SpawnUtil.spawnPlayer(pearl.getPlayer(), ExilePearlPlugin.getApi().getPearlConfig().getPrisonWorld());
+				pearl.getPlayer().sendMessage(ChatColor.YELLOW + "You've been imprisoned in the end by " + player.getDisplayName() + ".");
+			}
 		}
 		return true;
 	}
