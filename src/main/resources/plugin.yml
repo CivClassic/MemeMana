@@ -22,6 +22,9 @@ commands:
     manaupgrade:
         aliases: [mnu]
         permission: mememana.public
+    manafuellog:
+        aliases: [mnfl]
+        permission: mememana.public
     manareset:
         permission: mememana.admin
     manainspect:

@@ -43,7 +43,7 @@ public class PlayerActivityManager {
 	}
 
 	public void giveOutReward(UUID player, int amount) {
-		MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player)).addMana(amount);
+		MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player)).addMana(amount, player);
 		Bukkit.getPlayer(player).sendMessage(ChatColor.DARK_GREEN + "You got " + ChatColor.GOLD + amount + ChatColor.DARK_GREEN + " mana for logging in");
 	}
 }

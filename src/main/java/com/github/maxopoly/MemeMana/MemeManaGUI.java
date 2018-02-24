@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Date;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.BiConsumer;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-import java.time.Duration;
 import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import org.bukkit.Bukkit;
@@ -32,31 +35,36 @@ import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
 import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
+import vg.civcraft.mc.namelayer.NameAPI;
 
-public class MemeManaMaterializeGUI {
+public class MemeManaGUI<T> {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
 	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
 	static{
 		manaDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-	private final UUID uuid;
+	private final UUID showUUID;
+	private final Supplier<Collection<T>> getDisplayItems;
+	private final Function<T,ItemStack> getDisplayStack;
+	private final BiConsumer<T,Player> onClick;
 	private int currentPage;
 
-	public MemeManaMaterializeGUI(UUID uuid){
-		this.uuid = uuid;
+	public MemeManaGUI(UUID showPlayer, Supplier<Collection<T>> getDisplayItems, Function<T,ItemStack> getDisplayStack, BiConsumer<T,Player> onClick){
+		this.showUUID = showPlayer;
+		this.getDisplayItems = getDisplayItems;
+		this.getDisplayStack = getDisplayStack;
+		this.onClick = onClick;
 		this.currentPage = 0;
 	}
 
 	public void showScreen() {
-		Player p = Bukkit.getPlayer(uuid);
+		Player p = Bukkit.getPlayer(showUUID);
 		if(p == null){
 			return;
 		}
 		ClickableInventory.forceCloseInventory(p);
 		ClickableInventory ci = new ClickableInventory(54, "Mana inventory");
-		int ownerId = MemeManaOwnerManager.fromUUID(uuid);
-		MemeManaPouch pouch = MemeManaPouch.getPouch(ownerId);
-		TreeMap<Long,Integer> units = pouch.getRawUnits();
+		Collection<T> units = getDisplayItems.get();
 		if (units.size() < 45 * currentPage) {
 			// would show an empty page, so go to previous
 			currentPage--;
@@ -65,13 +73,18 @@ public class MemeManaMaterializeGUI {
 		if (units.size() == 0) {
 			//item to indicate that there is nothing to claim
 			ItemStack noClaim = new ItemStack(Material.BARRIER);
-			ISUtils.setName(noClaim, ChatColor.GOLD + "No mana available");
-			ISUtils.addLore(noClaim, ChatColor.RED + "You currently have no mana");
+			ISUtils.setName(noClaim, ChatColor.GOLD + "Nothing here");
 			ci.setSlot(new DecorationStack(noClaim), 4);
 		} else {
 			int nextSlot = 0;
-			for(long timestamp : units.keySet().stream().skip(45 * currentPage).limit(45).collect(Collectors.toList())){
-				ci.setSlot(createManaClickable(pouch,timestamp), nextSlot++);
+			for(T timestamp : units.stream().skip(45 * currentPage).limit(45).collect(Collectors.toList())){
+				ci.setSlot(new Clickable(getDisplayStack.apply(timestamp)) {
+						@Override
+						public void clicked(Player p) {
+							onClick.accept(timestamp,p);
+							showScreen();
+						}
+					},nextSlot++);
 			};
 		}
 		// previous button
@@ -118,35 +131,5 @@ public class MemeManaMaterializeGUI {
 		}, 49);
 
 		ci.showInventory(p);
-	}
-
-	private Clickable createManaClickable(MemeManaPouch pouch, long timestamp) {
-		// Give them the version without a timestamp or amount indicator
-		ItemStack toGive = new ItemStack(Material.EYE_OF_ENDER);
-		ISUtils.setName(toGive,"Mana");
-		ISUtils.addLore(toGive,"This is a meme of mana");
-		ItemMap toGiveMap = new ItemMap();
-		int manaInUnit = pouch.getUnitManaContent(timestamp);
-		toGiveMap.addItemAmount(toGive,manaInUnit);
-		// Display the version with timestamp and amount indicator
-		ItemStack toShow = toGive.clone();
-		ISUtils.addLore(toGive,"Doesn't decay");
-		ISUtils.addLore(toShow,"Amount: " + manaInUnit);
-		Duration expiryDeltaTime = Duration.ofMillis(MemeManaPlugin.getInstance().getManaConfig().getManaRotTime() - (new Date().getTime() - timestamp));
-		ISUtils.addLore(toShow,"Expires in " + String.format("%dd and %dh",expiryDeltaTime.toDays(),expiryDeltaTime.toHours() % 24) + " [" + manaDateFormat.format(new Date(timestamp)) + "]");
-		return new Clickable(toShow) {
-			@Override
-			public void clicked(Player p) {
-				PlayerInventory pInv = p.getInventory();
-				if (toGiveMap.fitsIn(pInv)) {
-					pouch.deleteSpecificManaUnitByTimestamp(timestamp);
-					toGiveMap.getItemStackRepresentation().forEach(u -> pInv.addItem(u));
-				} else {
-					p.sendMessage(ChatColor.RED + "There is not enough space in your inventory");
-				}
-				p.updateInventory();
-				showScreen();
-			}
-		};
 	}
 }
