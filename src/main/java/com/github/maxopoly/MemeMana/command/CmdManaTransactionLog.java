@@ -2,8 +2,9 @@ package com.github.maxopoly.MemeMana.command;
 
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.namelayer.NameAPI;
-import com.github.maxopoly.MemeMana.model.MemeManaUseLogEntry;
+import com.github.maxopoly.MemeMana.model.MemeManaTransferLogEntry;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -19,33 +20,34 @@ import java.util.Date;
 import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
 import net.md_5.bungee.api.ChatColor;
 
-public class CmdManaFuelLog extends PlayerCommand {
+public class CmdManaTransactionLog extends PlayerCommand {
 	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
 	static{
 		manaDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-	public CmdManaFuelLog(String name) {
+	public CmdManaTransactionLog(String name) {
 		super(name);
-		setIdentifier("manafuellog");
-		setDescription("See who has been keeping you pearled");
-		setUsage("/manafuellog");
-		setArguments(0,0);
+		setIdentifier("manaviewtranslog");
+		setDescription("See transactions for a mana owner");
+		setUsage("/manaviewtranslog");
+		setArguments(1,1);
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "Can't view fuel log from console");
+			sender.sendMessage(ChatColor.RED + "Can't view transaction log from console");
 			return true;
 		}
-		UUID playerId = ((Player) sender).getUniqueId();
-		MemeManaGUI<MemeManaUseLogEntry> gui = new MemeManaGUI<MemeManaUseLogEntry>(playerId,() -> MemeManaPlugin.getInstance().getDAO().getUseLog(playerId).collect(Collectors.toList()),use -> {
-			ItemStack toShow = new ItemStack(Material.EYE_OF_ENDER);
-			ISUtils.setName(toShow,NameAPI.getCurrentName(use.creator));
-			if(use.isUpgrade){
-				ISUtils.addLore(toShow,"Upgraded by: " + NameAPI.getCurrentName(use.fueler));
-			}else{
-				ISUtils.addLore(toShow,"Refueled by: " + NameAPI.getCurrentName(use.fueler));
-			}
+		Integer target = MemeManaOwnerManager.fromName(args[0]);
+		if (target == null) {
+			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid mana owner");
+			return false;
+		}
+		MemeManaGUI<MemeManaTransferLogEntry> gui = new MemeManaGUI<MemeManaTransferLogEntry>(((Player) sender).getUniqueId(),() -> MemeManaPlugin.getInstance().getDAO().getTransferLog(target).collect(Collectors.toList()),use -> {
+			ItemStack toShow = new ItemStack(Material.DOUBLE_PLANT);
+			ISUtils.setName(toShow,"Mana Transfer");
+			ISUtils.addLore(toShow,"From Mana Id: " + use.from);
+			ISUtils.addLore(toShow,"To Mana Id: " + use.to);
 			ISUtils.addLore(toShow,"Mana: " + use.manaAmount);
 			ISUtils.addLore(toShow,manaDateFormat.format(new Date(use.timestamp)));
 			return toShow;

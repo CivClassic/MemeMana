@@ -25,6 +25,9 @@ commands:
     manafuellog:
         aliases: [mnfl]
         permission: mememana.public
+    manaviewtranslog:
+        aliases: [mnvtl]
+        permission: mememana.admin
     manareset:
         permission: mememana.admin
     manainspect:
