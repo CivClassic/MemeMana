@@ -135,7 +135,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void registerUUID(UUID u) {
 		try (Connection connection = getConnection();
 				PreparedStatement getCreatorUUID = connection
-						.prepareStatement("insert into manaUUIDs (manaLogUUID) values (?) on duplicate key update manaLogUUID = manaLogUUID;")) {
+						.prepareStatement("insert ignore into manaUUIDs (manaLogUUID) values (?);")) {
 			getCreatorUUID.setString(1,u.toString());
 			getCreatorUUID.execute();
 		} catch (SQLException e) {
@@ -211,11 +211,12 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void transferUnitsUntil(int oldOwnerId, int newOwnerId, long timestamp) {
 		try (Connection connection = getConnection();
 				PreparedStatement transferUnits = connection
-						.prepareStatement("update manaUnits set ownerId=? where ownerId=? and gainTime<=?;")) {
+						.prepareStatement("update manaUnits set manaContent = (select sum(manaContent) from (select * from manaUnits) as n where gainTime = n.gainTime and (ownerId = n.ownerId or ownerId = ?) and creator = n.creator) where ownerId=? and gainTime<=?;")) {
 			transferUnits.setInt(1, newOwnerId);
 			transferUnits.setInt(2, oldOwnerId);
 			transferUnits.setLong(3, timestamp);
 			transferUnits.execute();
+			deleteUnitsUntil(oldOwnerId, timestamp);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem transferring mana units until specific timestamp", e);
 		}

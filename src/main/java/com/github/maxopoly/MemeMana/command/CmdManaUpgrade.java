@@ -16,6 +16,7 @@ import java.util.function.IntFunction;
 import java.util.function.BiConsumer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import com.civclassic.altmanager.AltManager;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import net.md_5.bungee.api.ChatColor;
@@ -38,7 +39,8 @@ public class CmdManaUpgrade extends PlayerCommand {
 			return true;
 		}
 		Player player = (Player) sender;
-		ExilePearl pearl = ExilePearlPlugin.getApi().getPearlFromItemStack(player.getInventory().getItemInMainHand());
+		ItemStack pearlStack = player.getInventory().getItemInMainHand();
+		ExilePearl pearl = ExilePearlPlugin.getApi().getPearlFromItemStack(pearlStack);
 		if (pearl == null) {
 			sender.sendMessage(ChatColor.RED + "You must be holding a pearl to upgrade it");
 			return true;
@@ -64,6 +66,7 @@ public class CmdManaUpgrade extends PlayerCommand {
 		if(pouch.removeMana(pearlUpgradeCost,logUsage)) {
 			pearl.setPearlType(PearlType.PRISON);
 			pearl.setHealth(ExilePearlPlugin.getApi().getPearlConfig().getPearlHealthStartValue());
+			pearl.validateItemStack(pearlStack);
 			sender.sendMessage(ChatColor.GREEN + "The pearl was successfully upgraded");
 			if(pearl.getPlayer() != null && pearl.getPlayer().isOnline()) {
 				SpawnUtil.spawnPlayer(pearl.getPlayer(), ExilePearlPlugin.getApi().getPearlConfig().getPrisonWorld());

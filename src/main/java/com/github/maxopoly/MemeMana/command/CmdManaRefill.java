@@ -14,6 +14,7 @@ import java.util.function.IntFunction;
 import java.util.function.BiConsumer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import com.civclassic.altmanager.AltManager;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import net.md_5.bungee.api.ChatColor;
@@ -36,7 +37,8 @@ public class CmdManaRefill extends PlayerCommand {
 			return true;
 		}
 		Player player = (Player) sender;
-		ExilePearl pearl = ExilePearlPlugin.getApi().getPearlFromItemStack(player.getInventory().getItemInMainHand());
+		ItemStack pearlStack = player.getInventory().getItemInMainHand();
+		ExilePearl pearl = ExilePearlPlugin.getApi().getPearlFromItemStack(pearlStack);
 		if (pearl == null) {
 			sender.sendMessage(ChatColor.RED + "You must be holding a pearl to refill it");
 			return true;
@@ -74,6 +76,7 @@ public class CmdManaRefill extends PlayerCommand {
 		};
 		if(pouch.removeMana(manaToUse,logUsage)) {
 			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
+			pearl.validateItemStack(pearlStack);
 			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
 			sender.sendMessage(ChatColor.GREEN + "The pearl was repaired from " + ChatColor.YELLOW + toPercent.apply(healthBefore) + "%" + ChatColor.GREEN + " health to " + ChatColor.YELLOW + toPercent.apply(pearl.getHealth()) + "%" + ChatColor.GREEN + " health, consuming " + ChatColor.GOLD + manaToUse + " mana");
 		}
