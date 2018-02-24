@@ -211,7 +211,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void transferUnitsUntil(int oldOwnerId, int newOwnerId, long timestamp) {
 		try (Connection connection = getConnection();
 				PreparedStatement transferUnits = connection
-						.prepareStatement("update manaUnits set manaContent = (select sum(manaContent) from (select * from manaUnits) as n where gainTime = n.gainTime and (ownerId = n.ownerId or ownerId = ?) and creator = n.creator) where ownerId=? and gainTime<=?;")) {
+						.prepareStatement("insert into manaUnits (gainTime, ownerId, creator, manaContent) select l.gainTime, ?, l.creator, l.manaContent from manaUnits l where ownerId=? and gainTime<=? on duplicate key update manaContent = l.manaContent + manaUnits.manaContent;")) {
 			transferUnits.setInt(1, newOwnerId);
 			transferUnits.setInt(2, oldOwnerId);
 			transferUnits.setLong(3, timestamp);
