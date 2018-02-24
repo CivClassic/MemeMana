@@ -43,6 +43,9 @@ public class CmdManaTransfer extends PlayerCommand {
 		if (args.length == 2) {
 			try {
 				transferAmount = Integer.parseInt(args[1]);
+				if(transferAmount <= 0){
+					throw new NumberFormatException();
+				}
 			} catch (Exception e) {
 				sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
 				return false;

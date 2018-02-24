@@ -55,6 +55,9 @@ public class CmdManaRefill extends PlayerCommand {
 		if (args.length == 1) {
 			try {
 				manaToUse = Integer.parseInt(args[0]);
+				if(manaToUse <= 0){
+					throw new NumberFormatException();
+				}
 			} catch (Exception e) {
 				sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid amount of mana");
 				return false;

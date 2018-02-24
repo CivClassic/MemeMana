@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.github.maxopoly.MemeMana.model.MemeManaUseLogEntry;
+import com.github.maxopoly.MemeMana.model.MemeManaTransferLogEntry;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,7 +50,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public void logManaTransfer(int fromId, int toId, int manaAmount){
 		try (Connection connection = getConnection();
 				PreparedStatement ps = connection
-						.prepareStatement("insert into manaLog (fromId, toId, manaAmount, logTime) values (?,?,?) on duplicate key update logTime = logTime, fromId = fromId, toId = toId, manaAmount = values(manaAmount) + manaAmount;")) {
+						.prepareStatement("insert into manaLog (fromId, toId, manaAmount, logTime) values (?,?,?,?) on duplicate key update logTime = logTime, fromId = fromId, toId = toId, manaAmount = values(manaAmount) + manaAmount;")) {
 			ps.setInt(1, fromId);
 			ps.setInt(2, toId);
 			ps.setInt(3, manaAmount);
@@ -78,6 +79,24 @@ public class MemeManaDAO extends ManagedDatasource {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem logging mana use", e);
 		}
+	}
+
+	public Stream<MemeManaTransferLogEntry> getTransferLog(int owner) {
+		try (Connection connection = getConnection();
+				PreparedStatement ps = connection
+						.prepareStatement("select * from manaLog where fromId = ? or toId = ?;")) {
+			ps.setInt(1,owner);
+			ps.setInt(2,owner);
+			ResultSet rs = ps.executeQuery();
+			Stream.Builder<MemeManaTransferLogEntry> b = Stream.builder();
+			while(rs.next()){
+				b.accept(new MemeManaTransferLogEntry(rs.getLong(1),rs.getInt(2),rs.getInt(3),rs.getInt(4)));
+			}
+			return b.build();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting creator UUID", e);
+		}
+		return null;
 	}
 
 	public Stream<MemeManaUseLogEntry> getUseLog(UUID pearled) {
