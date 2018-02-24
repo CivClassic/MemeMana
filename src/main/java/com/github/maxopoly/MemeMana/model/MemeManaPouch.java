@@ -139,10 +139,10 @@ public class MemeManaPouch {
 	// Must keep decay times correct
 	// true means successful
 	public boolean transferMana(MemeManaPouch toPouch, int amount) {
-		dao.logManaTransfer(ownerId, toPouch.ownerId, amount);
 		if(getManaContent() < amount){
 			return false;
 		}
+		dao.logManaTransfer(ownerId, toPouch.ownerId, amount);
 		TreeMap<Long,Integer> otherPouchRaw = toPouch.getRawUnits();
 		int leftToRemove = amount;
 		Long lastTimestampRemoved = null;

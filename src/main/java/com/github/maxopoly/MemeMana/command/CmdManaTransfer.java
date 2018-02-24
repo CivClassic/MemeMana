@@ -37,6 +37,10 @@ public class CmdManaTransfer extends PlayerCommand {
 			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid mana owner");
 			return false;
 		}
+		if(MemeManaOwnerManager.fromPlayer(player) == transferTo){
+			sender.sendMessage(ChatColor.RED + "Can't transfer mana to yourself");
+			return false;
+		}
 		
 		MemeManaPouch fromPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromPlayer(player));
 		int transferAmount = fromPouch.getManaContent();
