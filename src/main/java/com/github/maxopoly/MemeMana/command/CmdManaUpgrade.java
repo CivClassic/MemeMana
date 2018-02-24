@@ -4,12 +4,14 @@ import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.MemeManaDAO;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.IntFunction;
+import java.util.function.BiConsumer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.civclassic.altmanager.AltManager;
@@ -18,6 +20,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaUpgrade extends PlayerCommand {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
+	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
 	public CmdManaUpgrade(String name) {
 		super(name);
 		setIdentifier("manaupgrade");
@@ -52,7 +55,10 @@ public class CmdManaUpgrade extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "Upgrading costs " + ChatColor.GOLD + pearlUpgradeCost + ChatColor.RED + " mana, but you only have " + ChatColor.GOLD + manaAvailable + ChatColor.RED + " mana");
 			return true;
 		}
-		if(pouch.removeMana(pearlUpgradeCost)) {
+		BiConsumer<Long,Integer> logUsage = (l,a) -> {
+			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,true);
+		};
+		if(pouch.removeMana(pearlUpgradeCost,logUsage)) {
 			pearl.setPearlType(PearlType.PRISON);
 			pearl.setHealth(ExilePearlPlugin.getApi().getPearlConfig().getPearlHealthStartValue());
 			sender.sendMessage(ChatColor.GREEN + "The pearl was successfully upgraded");
