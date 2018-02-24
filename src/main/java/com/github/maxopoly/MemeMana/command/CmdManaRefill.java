@@ -9,6 +9,7 @@ import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Date;
 import java.util.function.IntFunction;
 import java.util.function.BiConsumer;
 import org.bukkit.command.CommandSender;
@@ -64,8 +65,9 @@ public class CmdManaRefill extends PlayerCommand {
 		}
 		int healthBefore = pearl.getHealth();
 		manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaToUse);
+		long canonTimestamp = new Date().getTime();
 		BiConsumer<Long,Integer> logUsage = (l,a) -> {
-			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,false);
+			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,false,canonTimestamp);
 		};
 		if(pouch.removeMana(manaToUse,logUsage)) {
 			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
