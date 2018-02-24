@@ -2,6 +2,7 @@ package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.model.MemeManaUseLogEntry;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 
 public class MemeManaDAO extends ManagedDatasource {
@@ -76,6 +78,23 @@ public class MemeManaDAO extends ManagedDatasource {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Problem logging mana use", e);
 		}
+	}
+
+	public Stream<MemeManaUseLogEntry> getUseLog(UUID pearled) {
+		try (Connection connection = getConnection();
+				PreparedStatement getCreatorUUID = connection
+						.prepareStatement("select l.logTime, c.manaLogUUID, u.manaLogUUID, p.manaLogUUID, l.upgrade, l.mana from manaUseLog l join manaUUIDs p on p.manaLogUUID = ? join manaUUIDs c on c.manaLogId = l.creator join manaUUIDs u on u.manaLogId = l.user;")) {
+			getCreatorUUID.setString(1,pearled.toString());
+			ResultSet rs = getCreatorUUID.executeQuery();
+			Stream.Builder<MemeManaUseLogEntry> b = Stream.builder();
+			while(rs.first()){
+				b.accept(new MemeManaUseLogEntry(rs.getLong(1),UUID.fromString(rs.getString(2)),UUID.fromString(rs.getString(3)),UUID.fromString(rs.getString(4)),rs.getBoolean(5),rs.getInt(6)));
+			}
+			return b.build();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Problem getting creator UUID", e);
+		}
+		return null;
 	}
 
 	/**

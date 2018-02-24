@@ -38,7 +38,12 @@ public class CmdManaMaterialize extends PlayerCommand {
 			PlayerInventory pInv = p.getInventory();
 			ItemMap toGiveMap = pouch.getPhysicalMana(timestamp);
 			if (toGiveMap.fitsIn(pInv)) {
-				pouch.deleteSpecificManaUnitByTimestamp(timestamp);
+				int manaContent = pouch.getUnitManaContent(timestamp);
+				if(manaContent == 1){
+					pouch.deleteSpecificManaUnitByTimestamp(timestamp);
+				}else{
+					pouch.adjustSpecificManaUnitByTimestamp(timestamp, manaContent - 1);
+				}
 				toGiveMap.getItemStackRepresentation().forEach(u -> pInv.addItem(u));
 			} else {
 				p.sendMessage(ChatColor.RED + "There is not enough space in your inventory");
