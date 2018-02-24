@@ -131,6 +131,11 @@ public class MemeManaPouch {
 		dao.snipeManaUnit(ownerId, gainTime);
 	}
 
+	public void adjustSpecificManaUnitByTimestamp(long gainTime, int manaRemaining){
+		units.replace(gainTime, manaRemaining);
+		dao.adjustManaUnit(ownerId, gainTime, manaRemaining);
+	}
+
 	// Must keep decay times correct
 	// true means successful
 	public boolean transferMana(MemeManaPouch toPouch, int amount) {
@@ -182,8 +187,7 @@ public class MemeManaPouch {
 		ISUtils.addLore(toGive,"This is a meme of mana");
 		ISUtils.addLore(toGive,"Doesn't decay");
 		ItemMap toGiveMap = new ItemMap();
-		int manaInUnit = getUnitManaContent(timestamp);
-		toGiveMap.addItemAmount(toGive,manaInUnit);
+		toGiveMap.addItemAmount(toGive,1);
 		return toGiveMap;
 	}
 

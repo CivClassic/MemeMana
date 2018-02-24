@@ -15,5 +15,6 @@ public class MemeManaCommandHandler extends CommandHandler{
 		addCommands(new CmdManaWithdraw("CmdManaWithdraw"));
 		addCommands(new CmdManaSimulateLogin("CmdManaSimulateLogin"));
 		addCommands(new CmdManaUpgrade("CmdManaUpgrade"));
+		addCommands(new CmdManaFuelLog("CmdManaFuelLog"));
 	}
 }
