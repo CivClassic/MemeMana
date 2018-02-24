@@ -11,12 +11,24 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.TimeZone;
+import java.time.Duration;
+import java.text.SimpleDateFormat;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
+import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
+import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
+import vg.civcraft.mc.namelayer.NameAPI;
 
 public class MemeManaPouch {
 	private static final MemeManaConfig config = MemeManaPlugin.getInstance().getManaConfig();
 	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
 	private static final Map<Integer,MemeManaPouch> allPouchesByOwner = new HashMap<Integer,MemeManaPouch>();
+	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+	static{
+		manaDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
 	// TreeMap to ensure chronological ordering by gain time
 	private TreeMap<Long,Integer> units;
 	public final int ownerId;
@@ -53,7 +65,7 @@ public class MemeManaPouch {
 	public void addMana(int amt, UUID creator) {
 		long gainTime = new Date().getTime();
 		dao.addManaUnit(amt, ownerId, gainTime, creator);
-		units.put(gainTime,amt);
+		units.merge(gainTime,amt,(a,b) -> a + b);
 	}
 
 	/**
@@ -64,8 +76,12 @@ public class MemeManaPouch {
 		return units.values().stream().mapToInt(e -> e).sum();
 	}
 
-	// Returns true if there was enough mana, false if no mana was removed
 	public boolean removeMana(int amount) {
+		return removeMana(amount,(l,a) -> {});
+	}
+
+	// Returns true if there was enough mana, false if no mana was removed
+	public boolean removeMana(int amount, BiConsumer<Long,Integer> onRemove) {
 		if(getManaContent() < amount){
 			return false;
 		}
@@ -77,10 +93,12 @@ public class MemeManaPouch {
 			long timestamp = iter.next();
 			int manaInThisUnit = units.get(timestamp);
 			if(manaInThisUnit <= leftToRemove){
+				onRemove.accept(timestamp, manaInThisUnit);
 				iter.remove();
 				lastTimestampRemoved = timestamp;
 				leftToRemove -= manaInThisUnit;
 			} else {
+				onRemove.accept(timestamp, leftToRemove);
 				manaLeftInNextUnit = manaInThisUnit - leftToRemove;
 				break;
 			}
@@ -155,5 +173,28 @@ public class MemeManaPouch {
 			// Making two database accesses is fun :D
 		}
 		return true;
+	}
+
+	public ItemMap getPhysicalMana(long timestamp) {
+		// Give them the version without a timestamp or amount indicator
+		ItemStack toGive = new ItemStack(Material.EYE_OF_ENDER);
+		ISUtils.setName(toGive,"Mana");
+		ISUtils.addLore(toGive,"This is a meme of mana");
+		ISUtils.addLore(toGive,"Doesn't decay");
+		ItemMap toGiveMap = new ItemMap();
+		int manaInUnit = getUnitManaContent(timestamp);
+		toGiveMap.addItemAmount(toGive,manaInUnit);
+		return toGiveMap;
+	}
+
+	public ItemStack getDisplayStack(long timestamp) {
+		ItemStack toShow = new ItemStack(Material.EYE_OF_ENDER);
+		ISUtils.setName(toShow,"Mana");
+		int manaInUnit = getUnitManaContent(timestamp);
+		ISUtils.addLore(toShow,"Amount: " + manaInUnit);
+		ISUtils.addLore(toShow,"Original Owner: " + NameAPI.getCurrentName(MemeManaPlugin.getInstance().getDAO().getCreatorUUID(ownerId,timestamp)));
+		Duration expiryDeltaTime = Duration.ofMillis(MemeManaPlugin.getInstance().getManaConfig().getManaRotTime() - (new Date().getTime() - timestamp));
+		ISUtils.addLore(toShow,"Expires in " + String.format("%dd and %dh",expiryDeltaTime.toDays(),expiryDeltaTime.toHours() % 24) + " [" + manaDateFormat.format(new Date(timestamp)) + "]");
+		return toShow;
 	}
 }

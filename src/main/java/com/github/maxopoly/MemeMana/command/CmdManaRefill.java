@@ -3,12 +3,14 @@ package com.github.maxopoly.MemeMana.command;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.MemeManaDAO;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.IntFunction;
+import java.util.function.BiConsumer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.civclassic.altmanager.AltManager;
@@ -17,6 +19,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaRefill extends PlayerCommand {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
+	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
 	public CmdManaRefill(String name) {
 		super(name);
 		setIdentifier("manarefill");
@@ -61,7 +64,10 @@ public class CmdManaRefill extends PlayerCommand {
 		}
 		int healthBefore = pearl.getHealth();
 		manaToUse = Math.min((int)Math.ceil((maxHealth - healthBefore) / (double)repairPerUnitMana), manaToUse);
-		if(pouch.removeMana(manaToUse)) {
+		BiConsumer<Long,Integer> logUsage = (l,a) -> {
+			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,false);
+		};
+		if(pouch.removeMana(manaToUse,logUsage)) {
 			pearl.setHealth(Math.min(healthBefore + repairPerUnitMana * manaToUse,maxHealth));
 			IntFunction<Integer> toPercent = h -> Math.min(100, Math.max(0, (int)Math.round(((double)h / maxHealth) * 100)));
 			sender.sendMessage(ChatColor.GREEN + "The pearl was repaired from " + ChatColor.YELLOW + toPercent.apply(healthBefore) + "%" + ChatColor.GREEN + " health to " + ChatColor.YELLOW + toPercent.apply(pearl.getHealth()) + "%" + ChatColor.GREEN + " health, consuming " + ChatColor.GOLD + manaToUse + " mana");
