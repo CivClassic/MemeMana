@@ -35,7 +35,7 @@ public class PlayerActivityManager {
 		if(stat.update()) {
 			MemeManaPlugin.getInstance().getDAO().updateManaStat(owner,stat);
 			if(ExilePearlPlugin.getApi().isPlayerExiled(player)){
-				giveOutReward(player,stat.getStreak());
+				giveOutReward(player,stat.getPayout());
 			}else{
 				Bukkit.getPlayer(player).sendMessage(ChatColor.GRAY + "You didn't get any mana because you are pearled");
 			}
