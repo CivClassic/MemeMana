@@ -102,7 +102,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	public Stream<MemeManaUseLogEntry> getUseLog(UUID pearled) {
 		try (Connection connection = getConnection();
 				PreparedStatement getCreatorUUID = connection
-						.prepareStatement("select l.logTime, c.manaLogUUID, u.manaLogUUID, p.manaLogUUID, l.upgrade, l.mana from manaUseLog l join manaUUIDs p on p.manaLogUUID = ? join manaUUIDs c on c.manaLogId = l.creator join manaUUIDs u on u.manaLogId = l.user;")) {
+						.prepareStatement("select l.logTime, c.manaLogUUID, u.manaLogUUID, p.manaLogUUID, l.upgrade, l.mana from manaUseLog l join manaUUIDs p on p.manaLogUUID = l.pearled join manaUUIDs c on c.manaLogId = l.creator join manaUUIDs u on u.manaLogId = l.user where l.manaLogUUID = ?;")) {
 			getCreatorUUID.setString(1,pearled.toString());
 			ResultSet rs = getCreatorUUID.executeQuery();
 			Stream.Builder<MemeManaUseLogEntry> b = Stream.builder();
