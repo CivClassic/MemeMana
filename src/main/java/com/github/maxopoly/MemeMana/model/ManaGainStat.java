@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class ManaGainStat {
 
+	// Bit field. Left -> Right is forward in time, right most position is lastDay
 	private int streak;
 	private long lastDay;
 
@@ -26,22 +27,27 @@ public class ManaGainStat {
 	 */
 	public boolean update() {
 		long currentDay = new Date().getTime();
-		if (currentDay - lastDay < MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout()) {
+		long daysPast = Math.max(0L,currentDay - lastDay)/MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout();
+		if (daysPast < 1) {
 			return false;
 		}
-		if (currentDay - lastDay < (MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout() * 2L)) {
-			streak = Math.min(streak + 1, MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana());
-			lastDay = currentDay;
-			return true;
-		}
-		streak = Math.max(1,streak - (int) Math.min((long) MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana(),Math.max(0L,currentDay - lastDay)/MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout()));
+		streak = ((streak << daysPast) | 1) & maxMask();
 		lastDay = currentDay;
 		return true;
 	}
 
-	public int getStreak() {
+	private int maxMask() {
+		return MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana();
+	}
+
+	public int getPayout() {
+		return Integer.bitCount(streak);
+	}
+
+	public int getStreakField() {
 		return streak;
 	}
+
 
 	public long getLastDay() {
 		return lastDay;

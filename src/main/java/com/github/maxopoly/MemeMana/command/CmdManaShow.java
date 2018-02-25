@@ -36,8 +36,8 @@ public class CmdManaShow extends PlayerCommand {
 		int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
 		sender.sendMessage(ChatColor.YELLOW + "You have " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
-		if(stat.getStreak() != 0) {
-			sender.sendMessage(ChatColor.YELLOW + "You are on a " + ChatColor.LIGHT_PURPLE + stat.getStreak() + ChatColor.YELLOW + " day login streak");
+		if(stat.getPayout() != 0) {
+			sender.sendMessage(ChatColor.YELLOW + "Your mana streak is " + ChatColor.LIGHT_PURPLE + stat.getPayout());
 		}
 		return true;
 	}
