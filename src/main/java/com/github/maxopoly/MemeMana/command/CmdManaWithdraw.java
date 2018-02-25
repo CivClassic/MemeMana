@@ -60,7 +60,7 @@ public class CmdManaWithdraw extends PlayerCommand {
 		}
 
 		if (fromPouch.transferMana(toPouch,transferAmount)) {
-			sender.sendMessage(ChatColor.GREEN + "You withdrew " + ChatColor.GOLD + transferAmount + " mana from the group " + ChatColor.AQUA + args[0]);
+			sender.sendMessage(ChatColor.GREEN + "You withdrew " + ChatColor.GOLD + transferAmount + + ChatColor.GREEN + " mana from the group " + ChatColor.AQUA + args[0]);
 			return true;
 		}
 		sender.sendMessage(ChatColor.RED + "Mana withdraw unsuccessful; Make sure you have enough mana in the group");
