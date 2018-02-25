@@ -302,7 +302,7 @@ public class MemeManaDAO extends ManagedDatasource {
 				PreparedStatement updateManaStat = connection
 						.prepareStatement("replace into manaStats (ownerId, streak, lastDay) values(?,?,?)")) {
 			updateManaStat.setInt(1, owner);
-			updateManaStat.setInt(2, stat.getStreak());
+			updateManaStat.setInt(2, stat.getStreakField());
 			updateManaStat.setLong(3, stat.getLastDay());
 			updateManaStat.execute();
 		} catch (SQLException e) {

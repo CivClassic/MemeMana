@@ -38,8 +38,8 @@ public class CmdManaInspect extends PlayerCommand {
 		int manaAvailable = pouch.getManaContent();
 		sender.sendMessage(ChatColor.AQUA + args[0] + ChatColor.YELLOW + " has " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
 		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
-		if(stat.getStreak() != 0) {
-			sender.sendMessage(ChatColor.AQUA + args[0] + ChatColor.YELLOW + " is on a " + ChatColor.LIGHT_PURPLE + stat.getStreak() + ChatColor.YELLOW + " day login streak");
+		if(stat.getPayout() != 0) {
+			sender.sendMessage(ChatColor.AQUA + args[0] + ChatColor.YELLOW + "'s mana streak is " + ChatColor.LIGHT_PURPLE + stat.getPayout());
 		}
 		if(sender instanceof Player){
 			UUID playerId = ((Player) sender).getUniqueId();
