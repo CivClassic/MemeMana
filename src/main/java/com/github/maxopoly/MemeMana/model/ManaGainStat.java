@@ -37,7 +37,7 @@ public class ManaGainStat {
 	}
 
 	private int maxMask() {
-		return MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana();
+		return ~((~0) << MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana());
 	}
 
 	public int getPayout() {
