@@ -46,7 +46,6 @@ public class CmdManaUpgrade extends PlayerCommand {
 			return true;
 		}
 		// Ignore pearls that are already upgraded
-		int maxHealth = ExilePearlPlugin.getApi().getPearlConfig().getPearlHealthMaxValue();
 		if (pearl.getPearlType() == PearlType.PRISON) {
 			sender.sendMessage(ChatColor.GREEN + "That pearl is already upgraded!");
 			return true;
