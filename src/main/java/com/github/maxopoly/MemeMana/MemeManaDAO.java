@@ -67,13 +67,13 @@ public class MemeManaDAO extends ManagedDatasource {
 		registerUUID(pearled);
 		try (Connection connection = getConnection();
 				PreparedStatement ps = connection
-						.prepareStatement("insert into manaUseLog (creator, user, pearled, upgrade, mana, logTime) select c.manaLogId, u.manaLogId, p.manaLogId, ?, ?, ? from manaUUIDs join manaUUIDs c on c.manaLogUUID = ? join manaUUIDs u on u.manaLogUUID = ? join manaUUIDs p on p.manaLogUUID = ? on duplicate key update creator = manaUseLog.creator, user = manaUseLog.user, pearled = manaUseLog.pearled, upgrade = manaUseLog.upgrade, mana = ? + manaUseLog.mana;")) {
-			ps.setBoolean(1, isUpgrade);
-			ps.setInt(2, amount);
-			ps.setLong(3, timestamp);
-			ps.setString(4, creator.toString());
-			ps.setString(5, user.toString());
-			ps.setString(6, pearled.toString());
+						.prepareStatement("insert into manaUseLog (creator, user, pearled, upgrade, mana, logTime) values ((select manaLogId from manaUUIDs where manaLogUUID = ?), (select manaLogId from manaUUIDs where manaLogUUID = ?), (select manaLogId from manaUUIDs where manaLogUUID = ?), ?, ?, ?) on duplicate key update creator = manaUseLog.creator, user = manaUseLog.user, pearled = manaUseLog.pearled, upgrade = manaUseLog.upgrade, mana = ? + manaUseLog.mana;")) {
+			ps.setString(1, creator.toString());
+			ps.setString(2, user.toString());
+			ps.setString(3, pearled.toString());
+			ps.setBoolean(4, isUpgrade);
+			ps.setInt(5, amount);
+			ps.setLong(6, timestamp);
 			ps.setInt(7, amount);
 			ps.execute();
 		} catch (SQLException e) {
