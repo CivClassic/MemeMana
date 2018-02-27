@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana.command;
 import com.devotedmc.ExilePearl.ExilePearl;
 import com.devotedmc.ExilePearl.PearlType;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
+import com.devotedmc.ExilePearl.command.BaseCommand;
 import com.devotedmc.ExilePearl.util.SpawnUtil;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.MemeManaDAO;
@@ -21,46 +22,41 @@ import com.civclassic.altmanager.AltManager;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import net.md_5.bungee.api.ChatColor;
 
-public class CmdManaUpgrade extends PlayerCommand {
+public class CmdManaUpgrade extends BaseCommand<MemeManaPlugin> {
 	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
 	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
-	public CmdManaUpgrade(String name) {
-		super(name);
-		setIdentifier("manaupgrade");
-		setDescription("Upgrade a pearl using mana");
-		setUsage("/manaupgrade");
-		setArguments(0,0);
+	public CmdManaUpgrade(MemeManaPlugin mmp) {
+		super(mmp);
+		this.aliases.add("upgrade");
+
+		this.senderMustBePlayer = true;
+		this.setHelpShort("Upgrade a pearl using mana");
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String [] args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "Can't refill from console");
-			return true;
-		}
-		Player player = (Player) sender;
-		ItemStack pearlStack = player.getInventory().getItemInMainHand();
+	public void perform() {
+		ItemStack pearlStack = player().getInventory().getItemInMainHand();
 		ExilePearl pearl = ExilePearlPlugin.getApi().getPearlFromItemStack(pearlStack);
 		if (pearl == null) {
 			sender.sendMessage(ChatColor.RED + "You must be holding a pearl to upgrade it");
-			return true;
+			return;
 		}
 		// Ignore pearls that are already upgraded
 		if (pearl.getPearlType() == PearlType.PRISON) {
 			sender.sendMessage(ChatColor.GREEN + "That pearl is already upgraded!");
-			return true;
+			return;
 		}
 		int pearlUpgradeCost = MemeManaPlugin.getInstance().getManaConfig().getPearlUpgradeAmount();
-		int owner = MemeManaOwnerManager.fromPlayer(player);
+		int owner = MemeManaOwnerManager.fromPlayer(player());
 		MemeManaPouch pouch = MemeManaPouch.getPouch(owner);
 		int manaAvailable = pouch.getManaContent();
 		if(pearlUpgradeCost > manaAvailable) {
 			sender.sendMessage(ChatColor.RED + "Upgrading costs " + ChatColor.GOLD + pearlUpgradeCost + ChatColor.RED + " mana, but you only have " + ChatColor.GOLD + manaAvailable + ChatColor.RED + " mana");
-			return true;
+			return;
 		}
 		long canonTimestamp = new Date().getTime();
 		BiConsumer<Long,Integer> logUsage = (l,a) -> {
-			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player.getUniqueId(),pearl.getPlayerId(),a,true,canonTimestamp);
+			dao.logManaUse(dao.getCreatorUUID(pouch.ownerId,l),player().getUniqueId(),pearl.getPlayerId(),a,true,canonTimestamp);
 		};
 		if(pouch.removeMana(pearlUpgradeCost,logUsage)) {
 			pearl.setPearlType(PearlType.PRISON);
@@ -69,14 +65,8 @@ public class CmdManaUpgrade extends PlayerCommand {
 			sender.sendMessage(ChatColor.GREEN + "The pearl was successfully upgraded");
 			if(pearl.getPlayer() != null && pearl.getPlayer().isOnline()) {
 				SpawnUtil.spawnPlayer(pearl.getPlayer(), ExilePearlPlugin.getApi().getPearlConfig().getPrisonWorld());
-				pearl.getPlayer().sendMessage(ChatColor.YELLOW + "You've been imprisoned in the end by " + player.getDisplayName() + ".");
+				pearl.getPlayer().sendMessage(ChatColor.YELLOW + "You've been imprisoned in the end by " + player().getDisplayName() + ".");
 			}
 		}
-		return true;
-	}
-
-	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args) {
-		return new LinkedList<String>(); //empty list
 	}
 }
