@@ -1,7 +1,9 @@
 package com.github.maxopoly.MemeMana.command;
 
+import org.bukkit.Bukkit;
 import vg.civcraft.mc.civmodcore.command.CommandHandler;
 import com.devotedmc.ExilePearl.command.CmdExilePearl;
+import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 
 public class MemeManaCommandHandler extends CommandHandler{
@@ -19,7 +21,9 @@ public class MemeManaCommandHandler extends CommandHandler{
 		addCommands(new CmdManaFuelLog("CmdManaFuelLog"));
 		addCommands(new CmdManaTransactionLog("CmdManaTransactionLog"));
 
-		CmdExilePearl.instance().addSubCommand(new CmdManaRefill(MemeManaPlugin.getInstance()));
-		CmdExilePearl.instance().addSubCommand(new CmdManaUpgrade(MemeManaPlugin.getInstance()));
+		if(Bukkit.getPluginManager().isPluginEnabled("ExilePearl")){
+			CmdExilePearl.instance().addSubCommand(new CmdManaRefill(MemeManaPlugin.getInstance()));
+			CmdExilePearl.instance().addSubCommand(new CmdManaUpgrade(MemeManaPlugin.getInstance()));
+		}
 	}
 }
