@@ -10,17 +10,11 @@ commands:
     manatransfer:
         aliases: [mng,mngive,managive,givemana,mnt,mntransfer,transfermana]
         permission: mememana.public
-    manarefill:
-        aliases: [mnr, mnf, manafill, refill]
-        permission: mememana.public
     manamaterialize:
         aliases: [mnmat]
         permission: mememana.public
     manawithdraw:
         aliases: [mnw]
-        permission: mememana.public
-    manaupgrade:
-        aliases: [mnu]
         permission: mememana.public
     manafuellog:
         aliases: [mnfl]
