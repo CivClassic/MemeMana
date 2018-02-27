@@ -21,15 +21,15 @@ You also need a significant amount of Mana to upgrade an Exile pearl to a Prison
 
 When you log in, you will get a message telling you how much Mana (if any) you got for logging in.
 You can check your total amount of Mana at any time by using `/manashow` or `/mns` for short.
-To refill a pearl, hold it in your hand and type `/manarefill` or `/mnr` (or `/manafill` or `/mnf`) to refill it as much as possible, or `/manarefill Amount` to refill it using up to `Amount` Mana.
+To refill a pearl, hold it in your hand and type `/ep refill` to refill it as much as possible, or `/ep refill Amount` to refill it using up to `Amount` Mana.
 
-To upgrade an Exile pearl to a Prison pearl, hold it in your hand, then use `/manaupgrade`.
+To upgrade an Exile pearl to a Prison pearl, hold it in your hand, then use `/ep upgrade`.
 
 ## I don't have vault access. How do I give my Mana to the vault owner?
 
 Type `/manatransfer Someone Amount` or `/mnt` (or `/mngive` or `/mng`) to transfer `Amount` Mana to the player or NameLayer group `Someone`.
 If someone transfers Mana to a group you have the `MEMEMANA_WITHDRAW` permission on, use `/manawithdraw Group Amount` to move the Mana from the NameLayer group to your personal account.
-Then you can use `/manarefill` (see above) to refill pearls.
+Then you can use `/ep refill` (see above) to refill pearls.
 
 ## Mana Decay
 
