@@ -13,6 +13,8 @@ manaGainTimeout: 22h
 manaWaitTime: 30m
 maximumDailyMana: 10
 pearlRefillAmount: 
-  EXILE: 1
-  PRISON: 1
-pearlupgradeAmount: 10
+  EXILE: 168
+  PRISON: 21
+pearlupgradeAmount: 64
+pearlDamageCurveInitial: 1
+pearlDamageCurveIncrement: 1

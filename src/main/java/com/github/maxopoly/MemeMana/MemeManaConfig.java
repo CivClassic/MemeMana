@@ -91,4 +91,18 @@ public class MemeManaConfig {
 	public int getPearlUpgradeAmount() {
 		return plugin.getConfig().getInt("pearlUpgradeAmount", 10);
 	}
+
+	/**
+	 * @return How much it damages pearls to log in on day one
+	 */
+	public int getPearlDamageCurveInitial() {
+		return plugin.getConfig().getInt("pearlDamageCurveInitial", 1);
+	}
+
+	/**
+	 * @return How much it damages pearls each day you log in after the first day
+	 */
+	public int getPearlDamageCurveIncrement() {
+		return plugin.getConfig().getInt("pearlDamageCurveIncrment", 1);
+	}
 }

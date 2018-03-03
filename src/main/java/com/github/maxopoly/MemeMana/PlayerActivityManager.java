@@ -3,6 +3,7 @@ package com.github.maxopoly.MemeMana;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
+import com.devotedmc.ExilePearl.ExilePearl;
 import com.civclassic.altmanager.AltManager;
 import org.bukkit.Bukkit;
 import java.util.Map;
@@ -42,8 +43,19 @@ public class PlayerActivityManager {
 		}
 	}
 
-	public void giveOutReward(UUID player, int amount) {
-		MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player)).addMana(amount, player);
-		Bukkit.getPlayer(player).sendMessage(ChatColor.DARK_GREEN + "You got " + ChatColor.GOLD + amount + ChatColor.DARK_GREEN + " mana for logging in");
+	private void giveOutReward(UUID player, int streakPayout) {
+		if(ExilePearlPlugin.getApi().isPlayerExiled(player)){
+			// streakPayout is in [1,max] so we subtract one to get proper scaling behavior
+			int damage = MemeManaPlugin.getInstance().getManaConfig().getPearlDamageCurveInitial() + MemeManaPlugin.getInstance().getManaConfig().getPearlDamageCurveIncrement() * (streakPayout - 1);
+			if(damage > 0){
+				ExilePearl pearl = ExilePearlPlugin.getApi().getPearl(player);
+				int oldHealth = pearl.getHealth();
+				pearl.setHealth(oldHealth - damage);
+				Bukkit.getPlayer(player).sendMessage(ChatColor.DARK_GREEN + "You damaged your pearl for " + ChatColor.GOLD + Math.min(oldHealth,damage) + ChatColor.DARK_GREEN + " health points by logging in");
+			}
+		}else{
+			MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player)).addMana(streakPayout, player);
+			Bukkit.getPlayer(player).sendMessage(ChatColor.DARK_GREEN + "You got " + ChatColor.GOLD + streakPayout + ChatColor.DARK_GREEN + " mana for logging in");
+		}
 	}
 }
