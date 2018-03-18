@@ -46,13 +46,19 @@ Your virtual Mana can be materialized into physical Mana, but **beware: physical
 Physical Mana is currently useless, but it might have a use in the future, like converting it to XP, or using it as an instant payment system.
 That said, you can get physical Mana by typing `/manamaterialize` or `/mnmat` and then clicking on Mana to materialize it.
 
+## I use multiple accounts. Do I get extra mana for logging in to each account?
+
+No. You get mana per-user, not per-account.
+If you use multiple accounts, they will share mana, and you will get mana exactly as often as you would normally, no matter how many accounts you use.
+This uses [AltManager](https://github.com/CivClassic/AltManager), which uses [BanStick](https://github.com/CivClassic/BanStick) associations.
+
 ## I don't want to make a spreadsheet of all my login times. How do I check when my Mana will decay?
 
 Hovering over the Mana in your `/manamaterialize` GUI will give you detailed information about when it will decay.
 
 ## I'm pearled and very very salty about it, and I want someone to blame. How do I figure out who is sponsoring my pearl?
 
-You can do `/manafuellog` or `/mnfl` to list all the times anyone has refueled or upgraded your pearl, including the person who originally recieved the mana for logging in.
+You can do `/manafuellog` or `/mnfl` to list all the times anyone has refueled or upgraded your pearl, including the account which originally recieved the mana for logging in.
 
 ## I'm an admin and I want to investigate someone's Mana without typing SQL queries. What do?
 
