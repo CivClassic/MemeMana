@@ -125,8 +125,8 @@ public class MemeManaGUI<T> {
 		ci.setSlot(new Clickable(backToOverview) {
 
 			@Override
-			public void clicked(Player arg0) {
-				// just let it close, dont do anything
+			public void clicked(Player player) {
+				player.closeInventory();
 			}
 		}, 49);
 
