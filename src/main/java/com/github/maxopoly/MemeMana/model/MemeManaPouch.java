@@ -184,7 +184,6 @@ public class MemeManaPouch {
 		// Give them the version without a timestamp or amount indicator
 		ItemStack toGive = new ItemStack(Material.EYE_OF_ENDER);
 		ISUtils.setName(toGive,"Mana");
-		ISUtils.addLore(toGive,"This is a meme of mana");
 		ISUtils.addLore(toGive,"Doesn't decay");
 		ItemMap toGiveMap = new ItemMap();
 		toGiveMap.addItemAmount(toGive,1);
