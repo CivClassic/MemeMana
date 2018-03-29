@@ -20,6 +20,7 @@ public class MemeManaCommandHandler extends CommandHandler{
 		addCommands(new CmdManaSimulateLogin("CmdManaSimulateLogin"));
 		addCommands(new CmdManaFuelLog("CmdManaFuelLog"));
 		addCommands(new CmdManaTransactionLog("CmdManaTransactionLog"));
+		addCommands(new CmdManaClaim("CmdManaClaim"));
 
 		if(Bukkit.getPluginManager().isPluginEnabled("ExilePearl")){
 			CmdExilePearl.instance().addSubCommand(new CmdManaRefill(MemeManaPlugin.getInstance()));
