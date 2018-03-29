@@ -20,8 +20,8 @@ public class LoginListener implements Listener {
 
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent e) {
-		giveManaTasks.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
-		notifyTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> com.civclassic.altmanager.AltManager.instance().getAlts(e.getPlayer().getUniqueId()).forEach(u -> Optional.ofNullable(Bukkit.getPlayer(u)).ifPresent(p -> p.sendMessage(ChatColor.GREEN + "You're mana is ready to claim. Use " + ChatColor.YELLOW + "/manaclaim" + ChatColor.GREEN + " to receive it")),MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime())));
+		manaLoginTimes.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
+		notifyTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> com.civclassic.altmanager.AltManager.instance().getAlts(e.getPlayer().getUniqueId()).forEach(u -> Optional.ofNullable(Bukkit.getPlayer(u)).ifPresent(p -> p.sendMessage(ChatColor.GREEN + "You're mana is ready to claim. Use " + ChatColor.YELLOW + "/manaclaim" + ChatColor.GREEN + " to receive it"))),MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime()));
 	}
 
 	@EventHandler
