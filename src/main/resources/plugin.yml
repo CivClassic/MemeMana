@@ -13,6 +13,9 @@ commands:
     manamaterialize:
         aliases: [mnmat]
         permission: mememana.public
+    manaclaim:
+        aliases: [mnc]
+        permission: mememana.public
     manawithdraw:
         aliases: [mnw]
         permission: mememana.public
