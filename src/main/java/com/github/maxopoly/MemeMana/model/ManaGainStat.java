@@ -26,13 +26,16 @@ public class ManaGainStat {
 	 * @return True if they should get mana
 	 */
 	public boolean update() {
-		long currentDay = new Date().getTime();
-		long daysPast = Math.max(0L,currentDay - lastDay)/MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout();
+		long currentMillis = System.currentTimeMillis();
+		// Offset for server restart time
+		long currentDay = (currentMillis - 36000000L) / 86400000L;
+		long lastLoginDay = (lastDay - 36000000L) / 86400000L;
+		long daysPast = Math.max(0L,currentDay - lastDay);
 		if (daysPast < 1) {
 			return false;
 		}
 		streak = ((streak << daysPast) | 1) & maxMask();
-		lastDay = currentDay;
+		lastDay = currentMillis;
 		return true;
 	}
 
@@ -48,13 +51,8 @@ public class ManaGainStat {
 		return streak;
 	}
 
-
 	public long getLastDay() {
 		return lastDay;
-	}
-
-	public long millisToNextGain() {
-		return MemeManaPlugin.getInstance().getManaConfig().getManaGainTimeout() - (new Date().getTime() - lastDay);
 	}
 
 	public void reset() {

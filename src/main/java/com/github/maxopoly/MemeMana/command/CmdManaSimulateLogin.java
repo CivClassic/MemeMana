@@ -25,7 +25,6 @@ public class CmdManaSimulateLogin extends PlayerCommand {
 		Player player = (Player) sender;
 		sender.sendMessage(ChatColor.YELLOW + "Simulating your login");
 		MemeManaPlugin.getInstance().getActivityManager().updatePlayer(player.getUniqueId());
-		sender.sendMessage(ChatColor.YELLOW + "Millis to next login: " + MemeManaPlugin.getInstance().getActivityManager().getForPlayer(MemeManaOwnerManager.fromPlayer(player)).millisToNextGain());
 		
 		return true;
 	}
