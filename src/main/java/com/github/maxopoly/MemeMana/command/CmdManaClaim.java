@@ -10,6 +10,7 @@ import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
+import com.github.maxopoly.MemeMana.listener.LoginListener;
 
 import net.md_5.bungee.api.ChatColor;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
@@ -36,7 +37,7 @@ public class CmdManaClaim extends PlayerCommand {
 		}
 		long timeRemaining = (MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime() * 50L) - (System.currentTimeMillis() - recentLogin);
 		if(timeRemaining <= 0L){
-			MemeManaPlugin.getInstance().getActivityManager().updatePlayer(e.getPlayer().getUniqueId());
+			MemeManaPlugin.getInstance().getActivityManager().updatePlayer(p.getUniqueId());
 		}else{
 			sender.sendMessage(ChatColor.RED + "Please wait " + (timeRemaining / 60000L) + " minutes before claiming your mana.");
 		}
