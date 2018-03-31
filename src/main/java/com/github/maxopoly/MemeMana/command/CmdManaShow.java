@@ -28,16 +28,39 @@ public class CmdManaShow extends PlayerCommand {
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
-		if (!(sender instanceof Player)) {
+		if (!(sender instanceof Player) && args.length == 0) {
 			sender.sendMessage(ChatColor.RED + "Can't show your own mana from console.");
 			return true;
 		}
-		int owner = MemeManaOwnerManager.fromPlayer((Player)sender);
-		int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
-		sender.sendMessage(ChatColor.YELLOW + "You have " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
-		ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
-		if(stat.getPayout() != 0) {
-			sender.sendMessage(ChatColor.YELLOW + "Your mana streak is " + ChatColor.LIGHT_PURPLE + stat.getPayout());
+
+		if (args.length > 0)
+		{
+			Group nlGroup = GroupManager.getGroup(args[0]);
+			if (nlGroup == null)
+			{
+				sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid NameLayer group");
+				return false;
+			}
+
+			if(!NameAPI.getGroupManager().hasAccess(nlGroup, ((Player) sender).getUniqueId(), PermissionType.getPermission(withdrawPermissionName))){
+				sender.sendMessage(ChatColor.RED + "You don't have permission to view mana from " + ChatColor.AQUA + args[0]);
+				return true;
+			}
+
+			int owner = MemeManaOwnerManager.fromNameLayerGroup(nlGroup);
+			int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
+
+			sender.sendMessage(ChatColor.GOLD + args[0] + " has " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
+		}
+		else
+		{
+			int owner = MemeManaOwnerManager.fromPlayer((Player)sender);
+			int manaAvailable = MemeManaPouch.getPouch(owner).getManaContent();
+			sender.sendMessage(ChatColor.YELLOW + "You have " + ChatColor.GOLD + manaAvailable + ChatColor.YELLOW + " mana");
+			ManaGainStat stat = MemeManaPlugin.getInstance().getActivityManager().getForPlayer(owner);
+			if(stat.getPayout() != 0) {
+				sender.sendMessage(ChatColor.YELLOW + "Your mana streak is " + ChatColor.LIGHT_PURPLE + stat.getPayout());
+			}
 		}
 		return true;
 	}
