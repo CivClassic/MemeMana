@@ -22,9 +22,9 @@ public class CmdManaShow extends PlayerCommand {
 	public CmdManaShow(String name) {
 		super(name);
 		setIdentifier("manashow");
-		setDescription("Show your own mana");
-		setUsage("/manashow");
-		setArguments(0,0);
+		setDescription("Show your own mana or the mana of a group you have access to");
+		setUsage("/manashow or /manashow <GROUP>");
+		setArguments(0,1);
 	}
 
 	public boolean execute(CommandSender sender, String [] args) {
@@ -39,7 +39,7 @@ public class CmdManaShow extends PlayerCommand {
 			if (nlGroup == null)
 			{
 				sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid NameLayer group");
-				return false;
+				return true;
 			}
 
 			if(!NameAPI.getGroupManager().hasAccess(nlGroup, ((Player) sender).getUniqueId(), PermissionType.getPermission(withdrawPermissionName))){
