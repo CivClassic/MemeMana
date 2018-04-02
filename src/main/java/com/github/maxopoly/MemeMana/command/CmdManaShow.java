@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.function.IntFunction;
 import java.text.DecimalFormat;
+import vg.civcraft.mc.namelayer.group.Group;
+import vg.civcraft.mc.namelayer.GroupManager;
+import vg.civcraft.mc.namelayer.permission.PermissionType;
 import net.md_5.bungee.api.ChatColor;
 
 public class CmdManaShow extends PlayerCommand {
@@ -42,7 +45,7 @@ public class CmdManaShow extends PlayerCommand {
 				return true;
 			}
 
-			if(!NameAPI.getGroupManager().hasAccess(nlGroup, ((Player) sender).getUniqueId(), PermissionType.getPermission(withdrawPermissionName))){
+			if(!NameAPI.getGroupManager().hasAccess(nlGroup, ((Player) sender).getUniqueId(), PermissionType.getPermission(CmdManaWithdraw.withdrawPermissionName))){
 				sender.sendMessage(ChatColor.RED + "You don't have permission to view mana from " + ChatColor.AQUA + args[0]);
 				return true;
 			}
