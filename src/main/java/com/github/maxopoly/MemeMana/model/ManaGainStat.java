@@ -28,9 +28,9 @@ public class ManaGainStat {
 	public boolean update() {
 		long currentMillis = System.currentTimeMillis();
 		long serverRestartOffset = MemeManaPlugin.getInstance().getManaConfig().getServerRestartOffset();
-		long currentDay = (currentMillis - serverRestartOffset) / 86400000L;
-		long lastLoginDay = (lastDay - serverRestartOffset) / 86400000L;
-		long daysPast = Math.max(0L,currentDay - lastDay);
+		long offsetDayRightNow = (currentMillis - serverRestartOffset) / 86400000L;
+		long offsetLastLoginDay = (lastDay - serverRestartOffset) / 86400000L;
+		long daysPast = offsetDayRightNow - offsetLastLoginDay;
 		if (daysPast < 1) {
 			return false;
 		}
