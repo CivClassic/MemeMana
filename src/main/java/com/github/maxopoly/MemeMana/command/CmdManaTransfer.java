@@ -32,18 +32,20 @@ public class CmdManaTransfer extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "Can't transfer mana to yourself");
 			return false;
 		}
-		
+
 		MemeManaPouch fromPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromPlayer(player));
 		int transferAmount = fromPouch.getManaContent();
 		if (args.length == 2) {
-			try {
-				transferAmount = Integer.parseInt(args[1]);
-				if(transferAmount <= 0){
-					throw new NumberFormatException();
+			if (!args[1].toString().equalsIgnoreCase("all")) {
+				try {
+					transferAmount = Integer.parseInt(args[1]);
+					if(transferAmount <= 0){
+						throw new NumberFormatException();
+					}
+				} catch (Exception e) {
+					sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
+					return false;
 				}
-			} catch (Exception e) {
-				sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
-				return false;
 			}
 		}
 		if (fromPouch.transferMana(MemeManaPouch.getPouch(transferTo),transferAmount)) {
