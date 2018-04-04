@@ -37,14 +37,16 @@ public class CmdManaWithdraw extends PlayerCommand {
 		MemeManaPouch fromPouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromNameLayerGroup(nlGroup));
 		int transferAmount = fromPouch.getManaContent();
 		if (args.length == 2) {
-			try {
-				transferAmount = Integer.parseInt(args[1]);
-				if(transferAmount <= 0){
-					throw new NumberFormatException();
+			if (!args[1].toString().equalsIgnoreCase("all")) {
+				try {
+					transferAmount = Integer.parseInt(args[1]);
+					if(transferAmount <= 0){
+						throw new NumberFormatException();
+					}
+				} catch (Exception e) {
+					sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
+					return false;
 				}
-			} catch (Exception e) {
-				sender.sendMessage(ChatColor.DARK_RED + args[1] + ChatColor.RED + " is not a valid amount of mana");
-				return false;
 			}
 		}
 		if(!NameAPI.getGroupManager().hasAccess(nlGroup, player.getUniqueId(), PermissionType.getPermission(withdrawPermissionName))){
