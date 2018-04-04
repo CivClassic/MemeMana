@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.function.IntFunction;
 import net.md_5.bungee.api.ChatColor;
 
+public static final int MAX_DISTANCE = 1000;
+
 public class CmdManaTransfer extends PlayerCommand {
 	public CmdManaTransfer(String name) {
 		super(name);
@@ -39,6 +41,12 @@ public class CmdManaTransfer extends PlayerCommand {
 		}
 		if(MemeManaOwnerManager.fromPlayer(player) == transferTo){
 			sender.sendMessage(ChatColor.RED + "Can't transfer mana to yourself");
+			return false;
+		}
+		
+		Player receiver = getCurrentName(transferTo);
+		if (!(findDistance(sender, receiver)) <= MAX_DISTANCE) {
+			sender.sendMessage(ChatColor.RED + "You are not within" + MAX_DISTANCE + "meters from the other player");
 			return false;
 		}
 		
@@ -65,5 +73,13 @@ public class CmdManaTransfer extends PlayerCommand {
 
 	public List <String> tabComplete(CommandSender sender, String [] args) {
 		return null; // Defaults to players
+	}
+	
+	public int findDistance(Player player1, Player player2) {
+		Location location1 = player1.getLocation();
+		Location location2 = player2.getLocation();
+		double realdistance = location1.distance(location2);
+		int distance = (int) realdistance;
+		return distance;
 	}
 }
