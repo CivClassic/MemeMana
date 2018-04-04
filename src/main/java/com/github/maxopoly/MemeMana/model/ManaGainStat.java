@@ -1,7 +1,6 @@
 package com.github.maxopoly.MemeMana.model;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import java.util.Date;
 
 public class ManaGainStat {
 

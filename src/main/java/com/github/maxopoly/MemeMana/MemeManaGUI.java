@@ -1,44 +1,24 @@
-package com.github.maxopoly.MemeMana.command;
+package com.github.maxopoly.MemeMana;
 
-import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.function.BiConsumer;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
-import org.bukkit.entity.Player;
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.Material;
-
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-
-import vg.civcraft.mc.civmodcore.command.PlayerCommand;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
 import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
-import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
-import vg.civcraft.mc.namelayer.NameAPI;
 
 public class MemeManaGUI<T> {
-	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
 	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
 	static{
 		manaDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -1,29 +1,20 @@
 package com.github.maxopoly.MemeMana.command;
 
 import com.devotedmc.ExilePearl.ExilePearl;
-import com.devotedmc.ExilePearl.PearlType;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
+import com.devotedmc.ExilePearl.PearlType;
 import com.devotedmc.ExilePearl.command.BaseCommand;
 import com.devotedmc.ExilePearl.util.SpawnUtil;
-import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.MemeManaDAO;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
-import com.github.maxopoly.MemeMana.model.ManaGainStat;
+import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Date;
-import java.util.function.IntFunction;
 import java.util.function.BiConsumer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import com.civclassic.altmanager.AltManager;
-import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.inventory.ItemStack;
 
 public class CmdManaUpgrade extends BaseCommand<MemeManaPlugin> {
-	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
 	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
 	public CmdManaUpgrade(MemeManaPlugin mmp) {
 		super(mmp);

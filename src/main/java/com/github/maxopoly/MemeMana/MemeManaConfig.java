@@ -1,8 +1,8 @@
 package com.github.maxopoly.MemeMana;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.ConfigurationSection;
 import com.devotedmc.ExilePearl.PearlType;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import vg.civcraft.mc.civmodcore.util.ConfigParsing;
 
 public class MemeManaConfig {

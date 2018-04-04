@@ -1,18 +1,16 @@
 package com.github.maxopoly.MemeMana;
 
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.model.MemeManaUseLogEntry;
 import com.github.maxopoly.MemeMana.model.MemeManaTransferLogEntry;
-import java.lang.reflect.InvocationTargetException;
+import com.github.maxopoly.MemeMana.model.MemeManaUseLogEntry;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -20,7 +18,6 @@ import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 
 public class MemeManaDAO extends ManagedDatasource {
 
-	private static final MemeManaOwnerManager ownerManager = MemeManaPlugin.getInstance().getOwnerManager();
 	private Logger logger;
 
 	public MemeManaDAO(MemeManaPlugin plugin, String user, String pass, String host, int port, String database,
@@ -244,7 +241,6 @@ public class MemeManaDAO extends ManagedDatasource {
 				PreparedStatement getManaOwner = connection
 						.prepareStatement("select id, foreignId, foreignIdType from manaOwners;");
 				ResultSet rs = getManaOwner.executeQuery();) {
-			int thisOwner = -1;
 			while(rs.next()) {
 				int id = rs.getInt(1);
 				OwnerType ty = MemeManaOwnerManager.ownerTypeFromMagicNumber(rs.getInt(3));

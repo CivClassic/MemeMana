@@ -1,10 +1,9 @@
 package com.github.maxopoly.MemeMana.command;
 
+import com.devotedmc.ExilePearl.command.CmdExilePearl;
+import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import org.bukkit.Bukkit;
 import vg.civcraft.mc.civmodcore.command.CommandHandler;
-import com.devotedmc.ExilePearl.command.CmdExilePearl;
-import com.devotedmc.ExilePearl.ExilePearlPlugin;
-import com.github.maxopoly.MemeMana.MemeManaPlugin;
 
 public class MemeManaCommandHandler extends CommandHandler{
 

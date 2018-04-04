@@ -1,18 +1,12 @@
 package com.github.maxopoly.MemeMana.command;
 
+import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.listener.LoginListener;
 import java.util.LinkedList;
 import java.util.List;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
-import com.github.maxopoly.MemeMana.MemeManaPlugin;
-import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.github.maxopoly.MemeMana.listener.LoginListener;
-
-import net.md_5.bungee.api.ChatColor;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 
 public class CmdManaClaim extends PlayerCommand {

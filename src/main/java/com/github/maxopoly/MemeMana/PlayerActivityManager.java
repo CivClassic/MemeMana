@@ -1,14 +1,12 @@
 package com.github.maxopoly.MemeMana;
 
+import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
-import com.devotedmc.ExilePearl.ExilePearlPlugin;
-import com.civclassic.altmanager.AltManager;
-import org.bukkit.Bukkit;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Date;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 public class PlayerActivityManager {
 

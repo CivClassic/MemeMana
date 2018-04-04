@@ -1,20 +1,16 @@
 package com.github.maxopoly.MemeMana.command;
 
-import com.devotedmc.ExilePearl.ExilePearl;
-import com.devotedmc.ExilePearl.ExilePearlPlugin;
-import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.MemeManaGUI;
 import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
-import com.civclassic.altmanager.AltManager;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
-import net.md_5.bungee.api.ChatColor;
-import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
 import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
 
 public class CmdManaMaterialize extends PlayerCommand {

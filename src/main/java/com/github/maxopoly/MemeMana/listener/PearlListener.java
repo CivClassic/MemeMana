@@ -1,11 +1,11 @@
 package com.github.maxopoly.MemeMana.listener;
 
+import com.devotedmc.ExilePearl.event.PlayerPearledEvent;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
 import com.github.maxopoly.MemeMana.model.ManaGainStat;
-import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import com.devotedmc.ExilePearl.event.PlayerPearledEvent;
 
 public class PearlListener implements Listener {
 

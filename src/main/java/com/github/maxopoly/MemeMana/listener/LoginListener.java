@@ -1,18 +1,17 @@
 package com.github.maxopoly.MemeMana.listener;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.Bukkit;
-import java.util.Optional;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class LoginListener implements Listener {
 	public static final Map<UUID,Long> manaLoginTimes = new HashMap<UUID,Long>();

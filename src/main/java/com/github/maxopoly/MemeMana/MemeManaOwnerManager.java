@@ -1,17 +1,14 @@
 package com.github.maxopoly.MemeMana;
 
+import com.civclassic.altmanager.AltManager;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.bukkit.entity.Player;
+import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.namelayer.group.Group;
-import vg.civcraft.mc.namelayer.GroupManager;
-import com.civclassic.altmanager.AltManager;
-import org.bukkit.entity.Player;
-
-import com.github.maxopoly.MemeMana.model.MemeManaPouch;
 
 public class MemeManaOwnerManager {
 
