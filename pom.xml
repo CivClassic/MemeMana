@@ -68,9 +68,9 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
 		</repository>
-                <!--<repository>
-			<id>teal-repo</id>
-			<url>http://dydoisbutts.info:8080/plugin/repository/everything/</url>
-                </repository>-->
+		<repository>
+			<id>aux-repo</id>
+			<url>http://aux.civclassic.com:8080/plugin/repository/everything/</url>
+		</repository>
 	</repositories>
 </project>
