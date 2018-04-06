@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana.listener;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,12 +21,16 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent e) {
 		manaLoginTimes.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
-		notifyTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> com.civclassic.altmanager.AltManager.instance().getAlts(e.getPlayer().getUniqueId()).forEach(u -> Optional.ofNullable(Bukkit.getPlayer(u)).ifPresent(p -> p.sendMessage(ChatColor.GREEN + "Your mana is ready to claim. Use " + ChatColor.YELLOW + "/manaclaim" + ChatColor.GREEN + " to receive it"))),MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime()));
+		notifyTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> {
+			if(0 == (1 & MemeManaPlugin.getInstance().getActivityManager().getForPlayer(MemeManaOwnerManager.fromUUID(e.getPlayer().getUniqueId())).getStreakField())){
+			com.civclassic.altmanager.AltManager.instance().getAlts(e.getPlayer().getUniqueId()).forEach(u -> Optional.ofNullable(Bukkit.getPlayer(u)).ifPresent(p -> p.sendMessage(ChatColor.GREEN + "Your mana is ready to claim. Use " + ChatColor.YELLOW + "/manaclaim" + ChatColor.GREEN + " to receive it")));
+			}
+		},MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime()));
 	}
 
 	@EventHandler
 	public void playerQuit(PlayerQuitEvent e) {
 		manaLoginTimes.remove(e.getPlayer().getUniqueId());
-		notifyTasks.remove(e.getPlayer().getUniqueId());
+		Optional.ofNullable(notifyTasks.remove(e.getPlayer().getUniqueId())).ifPresent(BukkitTask::cancel);
 	}
 }
