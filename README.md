@@ -58,7 +58,7 @@ Hovering over the Mana in your `/manamaterialize` GUI will give you detailed inf
 
 ## I'm pearled and very very salty about it, and I want someone to blame. How do I figure out who is sponsoring my pearl?
 
-You can do `/manafuellog` or `/mnfl` to list all the times anyone has refueled or upgraded your pearl, including the account which originally recieved the mana for logging in.
+You can do `/manafuellog` or `/mnfl` to list all the times anyone has refueled or upgraded your pearl, including the account which originally received the mana for logging in.
 
 ## I'm an admin and I want to investigate someone's Mana without typing SQL queries. What do?
 

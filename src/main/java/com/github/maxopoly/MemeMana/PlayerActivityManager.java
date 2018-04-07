@@ -38,7 +38,7 @@ public class PlayerActivityManager {
 				giveOutReward(player,stat.getPayout());
 			}
 		}else{
-			Bukkit.getPlayer(player).sendMessage(ChatColor.GRAY + "You didn't get any mana because you already recieved mana today");
+			Bukkit.getPlayer(player).sendMessage(ChatColor.GRAY + "You didn't get any mana because you already received mana today");
 		}
 	}
 
