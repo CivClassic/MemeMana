@@ -1,6 +1,7 @@
 package com.github.maxopoly.MemeMana.command;
 
 import com.github.maxopoly.MemeMana.MemeManaPlugin;
+import com.github.maxopoly.MemeMana.MemeManaOwnerManager;
 import com.github.maxopoly.MemeMana.listener.LoginListener;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +31,8 @@ public class CmdManaClaim extends PlayerCommand {
 			return true;
 		}
 		long timeRemaining = (MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime() * 50L) - (System.currentTimeMillis() - recentLogin);
-		if(timeRemaining <= 0L){
+		
+		if(timeRemaining <= 0L || 1 == (1 & MemeManaPlugin.getInstance().getActivityManager().getForPlayer(MemeManaOwnerManager.fromPlayer(p)).getStreakField())){
 			MemeManaPlugin.getInstance().getActivityManager().updatePlayer(p.getUniqueId());
 		}else{
 			sender.sendMessage(ChatColor.RED + "Please wait " + (timeRemaining / 60000L) + " minutes before claiming your mana.");
