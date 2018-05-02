@@ -56,6 +56,5 @@ public class ManaGainStat {
 
 	public void reset() {
 		this.streak = 0;
-		this.lastDay = 0;
 	}
 }
