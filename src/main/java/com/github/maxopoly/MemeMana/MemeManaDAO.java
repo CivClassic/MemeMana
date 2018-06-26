@@ -52,7 +52,7 @@ public class MemeManaDAO extends ManagedDatasource {
                 Map <Integer, Integer> remapping = new TreeMap<>();
                 try (Connection connection = getConnection();
                         PreparedStatement ps = connection
-                                .prepareStatement("select alts.player as uuid, m.id as id from manaOwners m inner join alts a on m.foreignId = a.groupid where foreignIdType = ?;")) {
+                                .prepareStatement("select a.player as uuid, m.id as id from manaOwners m inner join alts a on m.foreignId = a.groupid where foreignIdType = ?;")) {
                     ps.setInt(1,OwnerType.PLAYER_OWNER.magicOwnerTypeNumber);
                     try (ResultSet rs = ps.executeQuery()) {
                         while (rs.next()) {
