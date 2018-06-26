@@ -78,7 +78,7 @@ public class MemeManaDAO extends ManagedDatasource {
 
                 return true;
             }
-        }, "select 1 from manaOwners;");
+        });
 	}
 
 	public void logManaTransfer(int fromId, int toId, int manaAmount){
