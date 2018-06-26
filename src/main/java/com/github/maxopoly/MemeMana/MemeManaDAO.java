@@ -101,13 +101,18 @@ public class MemeManaDAO extends ManagedDatasource {
                 }
                 try (Connection connection = getConnection();
                         PreparedStatement ps = connection
-                                .prepareStatement("delete from manaOwners;")) {
+                                .prepareStatement("drop table manaStats;")) {
+                    ps.execute();
+                }
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);")) {
                     ps.execute();
                 }
                 for(UUID uuid : streaks.keySet()) {
                     try (Connection connection = getConnection();
                             PreparedStatement ps = connection
-                                    .prepareStatement("insert into manaOwners (ownerId, streak, lastDay) values(?,?,?);")) {
+                                    .prepareStatement("insert into manaStats (ownerId, streak, lastDay) values(?,?,?);")) {
                         ps.setInt(1, MemeManaOwnerManager.getExternalIDFromBanStick(uuid));
                         ps.setInt(2, streaks.get(uuid));
                         ps.setLong(3, lastDays.get(uuid));
