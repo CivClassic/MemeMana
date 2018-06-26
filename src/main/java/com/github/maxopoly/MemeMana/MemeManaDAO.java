@@ -79,6 +79,45 @@ public class MemeManaDAO extends ManagedDatasource {
                 return true;
             }
         });
+		registerMigration(2, false, new Callable<Boolean> () {
+
+            @Override
+            public Boolean call() throws Exception {
+                Map <UUID, Integer> streaks = new HashMap<>();
+                Map <UUID, Long> lastDays = new HashMap<>();
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("select m.streak as streak, m.lastDay as lastDay, a.player as uuid "
+                                        + "from manaStats m inner join alts a on m.ownerId = a.groupid;")) {
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            int streak = rs.getInt("streak");
+                            long lastDay = rs.getLong("lastDay");
+                            UUID uuid = UUID.fromString(rs.getString("uuid"));
+                            streaks.put(uuid, streak);
+                            lastDays.put(uuid, lastDay);
+                        }
+                    }
+                }
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("delete from manaOwners;")) {
+                    ps.execute();
+                }
+                for(UUID uuid : streaks.keySet()) {
+                    try (Connection connection = getConnection();
+                            PreparedStatement ps = connection
+                                    .prepareStatement("insert into manaOwners (ownerId, streak, lastDay) values(?,?,?);")) {
+                        ps.setInt(1, MemeManaOwnerManager.getExternalIDFromBanStick(uuid));
+                        ps.setInt(2, streaks.get(uuid));
+                        ps.setLong(3, lastDays.get(uuid));
+                        ps.execute();
+                    }
+                }
+                return true;
+            }
+
+		});
 	}
 
 	public void logManaTransfer(int fromId, int toId, int manaAmount){
