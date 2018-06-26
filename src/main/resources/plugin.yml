@@ -2,7 +2,7 @@ name: ${project.name}
 main: com.github.maxopoly.MemeMana.MemeManaPlugin
 author: Maxopoly
 version: ${project.version}
-depend: [CivModCore, AltManager, ExilePearl]
+depend: [CivModCore, BanStick, ExilePearl]
 commands:
     manashow:
         aliases: [mns, mana, showmana]

@@ -10,7 +10,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -42,6 +45,40 @@ public class MemeManaDAO extends ManagedDatasource {
 				"create table if not exists manaLog (logTime bigint not null, fromId int not null references manaOwners(id), toId int not null references manaOwners(id), manaAmount int not null, primary key(logTime,fromId,toId));",
 				"create table if not exists manaUseLog (logTime bigint not null, creator int not null references manaUUIDs(manaLogId), user int not null references manaUUIDs(manaLogId), pearled int not null references manaUUIDs(manaLogId), upgrade boolean not null, mana int not null, primary key(logTime,creator,user,pearled,upgrade));",
 				"create table if not exists manaUUIDs (manaLogId int not null auto_increment, manaLogUUID varchar(40) unique not null, primary key(manaLogId));");
+		registerMigration(1, false, new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws Exception {
+                Map <Integer, Integer> remapping = new TreeMap<>();
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("select alts.player as uuid, m.id as id from manaOwners m inner join alts a on m.foreignId = a.groupid where foreignIdType = ?;")) {
+                    ps.setInt(1,OwnerType.PLAYER_OWNER.magicOwnerTypeNumber);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            UUID uuid = UUID.fromString(rs.getString("uuid"));
+                            int internalID = rs.getInt("id");
+                            int newExternalID = MemeManaOwnerManager.getExternalIDFromBanStick(uuid);
+                            if (newExternalID != -1) {
+                                remapping.put(internalID, newExternalID);
+                            }
+                        }
+                    }
+                }
+
+                for(Entry <Integer, Integer> entry : remapping.entrySet()) {
+                    try (Connection connection = getConnection();
+                            PreparedStatement ps = connection
+                                    .prepareStatement("update manaOwners set foreignID = ? where id = ?;")) {
+                        ps.setInt(1, entry.getValue());
+                        ps.setInt(2, entry.getKey());
+                        ps.execute();
+                    }
+                }
+
+                return true;
+            }
+        }, "select 1 from manaOwners;");
 	}
 
 	public void logManaTransfer(int fromId, int toId, int manaAmount){
@@ -233,7 +270,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	}
 
 	public Map<OwnerType, Map<Integer, Integer>> loadAllManaOwners() {
-		Map<OwnerType,Map<Integer,Integer>> owners = new HashMap<OwnerType,Map<Integer,Integer>>();
+		Map<OwnerType,Map<Integer,Integer>> owners = new HashMap<>();
 		for(OwnerType ty : OwnerType.values()){
 			owners.put(ty,new HashMap<Integer,Integer>());
 		}
@@ -312,7 +349,7 @@ public class MemeManaDAO extends ManagedDatasource {
 				PreparedStatement getManaStats = connection
 						.prepareStatement("select * from manaStats;")) {
 			ResultSet rs = getManaStats.executeQuery();
-			Map<Integer,ManaGainStat> out = new HashMap<Integer,ManaGainStat>();
+			Map<Integer,ManaGainStat> out = new HashMap<>();
 			while(rs.next()) {
 				out.put(rs.getInt(1),new ManaGainStat(rs.getInt(2),rs.getLong(3)));
 			}
