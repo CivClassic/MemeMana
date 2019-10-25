@@ -11,7 +11,10 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -43,6 +46,84 @@ public class MemeManaDAO extends ManagedDatasource {
 				"create table if not exists manaLog (logTime bigint not null, fromId int not null references manaOwners(id), toId int not null references manaOwners(id), manaAmount int not null, primary key(logTime,fromId,toId));",
 				"create table if not exists manaUseLog (logTime bigint not null, creator int not null references manaUUIDs(manaLogId), user int not null references manaUUIDs(manaLogId), pearled int not null references manaUUIDs(manaLogId), upgrade boolean not null, mana int not null, primary key(logTime,creator,user,pearled,upgrade));",
 				"create table if not exists manaUUIDs (manaLogId int not null auto_increment, manaLogUUID varchar(40) unique not null, primary key(manaLogId));");
+		registerMigration(1, false, new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws Exception {
+                Map <Integer, Integer> remapping = new TreeMap<>();
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("select a.player as uuid, m.id as id from manaOwners m inner join alts a on m.foreignId = a.groupid where foreignIdType = ?;")) {
+                    ps.setInt(1,OwnerType.PLAYER_OWNER.magicOwnerTypeNumber);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            UUID uuid = UUID.fromString(rs.getString("uuid"));
+                            int internalID = rs.getInt("id");
+                            int newExternalID = MemeManaOwnerManager.getExternalIDFromBanStick(uuid);
+                            if (newExternalID != -1) {
+                                remapping.put(internalID, newExternalID);
+                            }
+                        }
+                    }
+                }
+
+                for(Entry <Integer, Integer> entry : remapping.entrySet()) {
+                    try (Connection connection = getConnection();
+                            PreparedStatement ps = connection
+                                    .prepareStatement("update manaOwners set foreignID = ? where id = ?;")) {
+                        ps.setInt(1, entry.getValue());
+                        ps.setInt(2, entry.getKey());
+                        ps.execute();
+                    }
+                }
+
+                return true;
+            }
+        });
+		registerMigration(2, false, new Callable<Boolean> () {
+
+            @Override
+            public Boolean call() throws Exception {
+                Map <UUID, Integer> streaks = new HashMap<>();
+                Map <UUID, Long> lastDays = new HashMap<>();
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("select m.streak as streak, m.lastDay as lastDay, a.player as uuid "
+                                        + "from manaStats m inner join alts a on m.ownerId = a.groupid;")) {
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            int streak = rs.getInt("streak");
+                            long lastDay = rs.getLong("lastDay");
+                            UUID uuid = UUID.fromString(rs.getString("uuid"));
+                            streaks.put(uuid, streak);
+                            lastDays.put(uuid, lastDay);
+                        }
+                    }
+                }
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("drop table manaStats;")) {
+                    ps.execute();
+                }
+                try (Connection connection = getConnection();
+                        PreparedStatement ps = connection
+                                .prepareStatement("create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);")) {
+                    ps.execute();
+                }
+                for(UUID uuid : streaks.keySet()) {
+                    try (Connection connection = getConnection();
+                            PreparedStatement ps = connection
+                                    .prepareStatement("insert into manaStats (ownerId, streak, lastDay) values(?,?,?);")) {
+                        ps.setInt(1, MemeManaOwnerManager.getExternalIDFromBanStick(uuid));
+                        ps.setInt(2, streaks.get(uuid));
+                        ps.setLong(3, lastDays.get(uuid));
+                        ps.execute();
+                    }
+                }
+                return true;
+            }
+
+		});
 	}
 
 	public void logManaTransfer(int fromId, int toId, int manaAmount){

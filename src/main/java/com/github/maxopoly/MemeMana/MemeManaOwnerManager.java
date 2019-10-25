@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.bukkit.entity.Player;
+
+import com.programmerdan.minecraft.banstick.data.BSPlayer;
+
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.namelayer.group.Group;
@@ -39,7 +42,22 @@ public class MemeManaOwnerManager {
 	}
 
 	public static int fromUUID(UUID uuid) {
-		return MemeManaPlugin.getInstance().getOwnerManager().getOwnerByExternal(OwnerType.PLAYER_OWNER,AltManager.instance().getAssociationGroup(uuid));
+	   int id = getExternalIDFromBanStick(uuid);
+		return MemeManaPlugin.getInstance().getOwnerManager().getOwnerByExternal(OwnerType.PLAYER_OWNER,id);
+	}
+
+	public static int getExternalIDFromBanStick(UUID uuid) {
+	    BSPlayer player = BSPlayer.byUUID(uuid);
+        if(player == null) {
+            return -1;
+        }
+        //find minimal id in the alt group to identify the group. This id will not change unless the player gets associated with even older accounts,
+        //in which case he will get the other players mana pouch
+        long id = player.getId();
+        for(BSPlayer alt : player.getTransitiveSharedPlayers(true)) {
+            id = Math.min(id, alt.getId());
+        }
+        return (int) id;
 	}
 
 	public static Integer fromPlayerName(String playerName) {
