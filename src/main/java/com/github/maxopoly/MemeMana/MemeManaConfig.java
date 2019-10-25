@@ -24,8 +24,8 @@ public class MemeManaConfig {
 		plugin.reloadConfig();
 		FileConfiguration config = plugin.getConfig();
 		// 50 millis per tick
-		manaRotTime = ConfigParsing.parseTime(config.getString("manaRotTime", "90d")) * 50L;
-		manaWaitTime = ConfigParsing.parseTime(config.getString("manaWaitTime", "30m"));
+		manaRotTime = ConfigParsing.parseTime(config.getString("manaRotTime", "90d"));
+		manaWaitTime = ConfigParsing.parseTime(config.getString("manaWaitTime", "30m")) / 50;
 		serverRestartOffset = ConfigParsing.parseTime(config.getString("serverRestartOffset", "10h5m"));
 		maximumDailyMana = config.getInt("maxDailyMana", 10);
 	}

@@ -19,6 +19,7 @@ public class CmdManaClaim extends PlayerCommand {
 		setArguments(0,0);
 	}
 
+	@Override
 	public boolean execute(CommandSender sender, String [] args) {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "Can't claim mana from console.");
@@ -40,7 +41,8 @@ public class CmdManaClaim extends PlayerCommand {
 		return true;
 	}
 
+	@Override
 	public List <String> tabComplete(CommandSender sender, String [] args) {
-		return new LinkedList <String> (); //empty list
+		return new LinkedList <> (); //empty list
 	}
 }

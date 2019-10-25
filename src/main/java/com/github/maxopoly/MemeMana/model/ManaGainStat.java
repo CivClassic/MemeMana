@@ -27,8 +27,8 @@ public class ManaGainStat {
 	public boolean update() {
 		long currentMillis = System.currentTimeMillis();
 		long serverRestartOffset = MemeManaPlugin.getInstance().getManaConfig().getServerRestartOffset();
-		long offsetDayRightNow = (currentMillis - serverRestartOffset) / 86400000L;
-		long offsetLastLoginDay = (lastDay - serverRestartOffset) / 86400000L;
+		long offsetDayRightNow = (currentMillis - serverRestartOffset) / 86_400_000L;
+		long offsetLastLoginDay = (lastDay - serverRestartOffset) / 86_400_000L;
 		long daysPast = offsetDayRightNow - offsetLastLoginDay;
 		if (daysPast < 1) {
 			return false;
@@ -38,7 +38,7 @@ public class ManaGainStat {
 		return true;
 	}
 
-	private int maxMask() {
+	private static int maxMask() {
 		return ~((~0) << MemeManaPlugin.getInstance().getManaConfig().getMaximumDailyMana());
 	}
 

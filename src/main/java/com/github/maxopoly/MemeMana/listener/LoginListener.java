@@ -22,7 +22,7 @@ public class LoginListener implements Listener {
 		manaLoginTimes.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
 		notifyTasks.put(e.getPlayer().getUniqueId(),Bukkit.getScheduler().runTaskLater(MemeManaPlugin.getInstance(),() -> {
 			if(0 == (1 & MemeManaPlugin.getInstance().getActivityManager().getForPlayer(MemeManaOwnerManager.fromUUID(e.getPlayer().getUniqueId())).getStreakField())){
-
+				MemeManaPlugin.getInstance().getActivityManager().updatePlayer(e.getPlayer().getUniqueId());
 			}
 		},MemeManaPlugin.getInstance().getManaConfig().getManaWaitTime()));
 	}
