@@ -14,8 +14,9 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
-import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
 import vg.civcraft.mc.namelayer.NameAPI;
 
 public class CmdManaFuelLog extends PlayerCommand {
@@ -38,16 +39,16 @@ public class CmdManaFuelLog extends PlayerCommand {
 			return true;
 		}
 		UUID playerId = ((Player) sender).getUniqueId();
-		MemeManaGUI<MemeManaUseLogEntry> gui = new MemeManaGUI<MemeManaUseLogEntry>(playerId,() -> MemeManaPlugin.getInstance().getDAO().getUseLog(playerId).collect(Collectors.toList()),use -> {
-			ItemStack toShow = new ItemStack(Material.EYE_OF_ENDER);
-			ISUtils.setName(toShow,NameAPI.getCurrentName(use.creator));
+		MemeManaGUI<MemeManaUseLogEntry> gui = new MemeManaGUI<>(playerId,() -> MemeManaPlugin.getInstance().getDAO().getUseLog(playerId).collect(Collectors.toList()),use -> {
+			ItemStack toShow = new ItemStack(Material.ENDER_EYE);
+			ItemAPI.setDisplayName(toShow,NameAPI.getCurrentName(use.creator));
 			if(use.isUpgrade){
-				ISUtils.addLore(toShow,"Upgraded by: " + NameAPI.getCurrentName(use.fueler));
+				ItemAPI.addLore(toShow,"Upgraded by: " + NameAPI.getCurrentName(use.fueler));
 			}else{
-				ISUtils.addLore(toShow,"Refueled by: " + NameAPI.getCurrentName(use.fueler));
+				ItemAPI.addLore(toShow,"Refueled by: " + NameAPI.getCurrentName(use.fueler));
 			}
-			ISUtils.addLore(toShow,"Mana: " + use.manaAmount);
-			ISUtils.addLore(toShow,manaDateFormat.format(new Date(use.timestamp)));
+			ItemAPI.addLore(toShow,"Mana: " + use.manaAmount);
+			ItemAPI.addLore(toShow,manaDateFormat.format(new Date(use.timestamp)));
 			return toShow;
 		},(timestamp,p) -> {});
 		gui.showScreen();

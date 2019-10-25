@@ -45,16 +45,11 @@ public class MemeManaPlugin extends ACivMod {
 	}
 
 	// By default, admins and owners have access to take mana.
-	private void registerNameLayerPerm(){
-		LinkedList<PlayerType> defaultPerms = new LinkedList<PlayerType>();
+	private static void registerNameLayerPerm(){
+		LinkedList<PlayerType> defaultPerms = new LinkedList<>();
 		defaultPerms.add(PlayerType.ADMINS);
 		defaultPerms.add(PlayerType.OWNER);
 		PermissionType.registerPermission(CmdManaWithdraw.withdrawPermissionName, defaultPerms);
-	}
-
-	@Override
-	protected String getPluginName() {
-		return "MemeMana";
 	}
 
 	public MemeManaConfig getManaConfig() {

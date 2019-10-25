@@ -14,8 +14,9 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
-import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
 
 public class CmdManaTransactionLog extends PlayerCommand {
 	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
@@ -41,13 +42,13 @@ public class CmdManaTransactionLog extends PlayerCommand {
 			sender.sendMessage(ChatColor.DARK_RED + args[0] + ChatColor.RED + " is not a valid mana owner");
 			return false;
 		}
-		MemeManaGUI<MemeManaTransferLogEntry> gui = new MemeManaGUI<MemeManaTransferLogEntry>(((Player) sender).getUniqueId(),() -> MemeManaPlugin.getInstance().getDAO().getTransferLog(target).collect(Collectors.toList()),use -> {
-			ItemStack toShow = new ItemStack(Material.DOUBLE_PLANT);
-			ISUtils.setName(toShow,"Mana Transfer");
-			ISUtils.addLore(toShow,"From Mana Id: " + use.from);
-			ISUtils.addLore(toShow,"To Mana Id: " + use.to);
-			ISUtils.addLore(toShow,"Mana: " + use.manaAmount);
-			ISUtils.addLore(toShow,manaDateFormat.format(new Date(use.timestamp)));
+		MemeManaGUI<MemeManaTransferLogEntry> gui = new MemeManaGUI<>(((Player) sender).getUniqueId(),() -> MemeManaPlugin.getInstance().getDAO().getTransferLog(target).collect(Collectors.toList()),use -> {
+			ItemStack toShow = new ItemStack(Material.TALL_GRASS);
+			ItemAPI.setDisplayName(toShow,"Mana Transfer");
+			ItemAPI.addLore(toShow,"From Mana Id: " + use.from);
+			ItemAPI.addLore(toShow,"To Mana Id: " + use.to);
+			ItemAPI.addLore(toShow,"Mana: " + use.manaAmount);
+			ItemAPI.addLore(toShow,manaDateFormat.format(new Date(use.timestamp)));
 			return toShow;
 		},(timestamp,p) -> {});
 		gui.showScreen();

@@ -16,14 +16,15 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
+
+import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.itemHandling.ItemMap;
 import vg.civcraft.mc.namelayer.NameAPI;
 
 public class MemeManaPouch {
 	private static final MemeManaConfig config = MemeManaPlugin.getInstance().getManaConfig();
 	private static final MemeManaDAO dao = MemeManaPlugin.getInstance().getDAO();
-	private static final Map<Integer,MemeManaPouch> allPouchesByOwner = new HashMap<Integer,MemeManaPouch>();
+	private static final Map<Integer,MemeManaPouch> allPouchesByOwner = new HashMap<>();
 	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
 	static{
 		manaDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -181,22 +182,22 @@ public class MemeManaPouch {
 
 	public ItemMap getPhysicalMana(long timestamp) {
 		// Give them the version without a timestamp or amount indicator
-		ItemStack toGive = new ItemStack(Material.EYE_OF_ENDER);
-		ISUtils.setName(toGive,"Mana");
-		ISUtils.addLore(toGive,"Doesn't decay");
+		ItemStack toGive = new ItemStack(Material.ENDER_EYE);
+		ItemAPI.setDisplayName(toGive,"Mana");
+		ItemAPI.addLore(toGive,"Doesn't decay");
 		ItemMap toGiveMap = new ItemMap();
 		toGiveMap.addItemAmount(toGive,1);
 		return toGiveMap;
 	}
 
 	public ItemStack getDisplayStack(long timestamp) {
-		ItemStack toShow = new ItemStack(Material.EYE_OF_ENDER);
-		ISUtils.setName(toShow,"Mana");
+		ItemStack toShow = new ItemStack(Material.ENDER_EYE);
+		ItemAPI.setDisplayName(toShow,"Mana");
 		int manaInUnit = getUnitManaContent(timestamp);
-		ISUtils.addLore(toShow,"Amount: " + manaInUnit);
-		ISUtils.addLore(toShow,"Original Owner: " + NameAPI.getCurrentName(MemeManaPlugin.getInstance().getDAO().getCreatorUUID(ownerId,timestamp)));
+		ItemAPI.addLore(toShow,"Amount: " + manaInUnit);
+		ItemAPI.addLore(toShow,"Original Owner: " + NameAPI.getCurrentName(MemeManaPlugin.getInstance().getDAO().getCreatorUUID(ownerId,timestamp)));
 		Duration expiryDeltaTime = Duration.ofMillis(MemeManaPlugin.getInstance().getManaConfig().getManaRotTime() - (new Date().getTime() - timestamp));
-		ISUtils.addLore(toShow,"Expires in " + String.format("%dd and %dh",expiryDeltaTime.toDays(),expiryDeltaTime.toHours() % 24) + " [" + manaDateFormat.format(new Date(timestamp)) + "]");
+		ItemAPI.addLore(toShow,"Expires in " + String.format("%dd and %dh",expiryDeltaTime.toDays(),expiryDeltaTime.toHours() % 24) + " [" + manaDateFormat.format(new Date(timestamp)) + "]");
 		return toShow;
 	}
 }

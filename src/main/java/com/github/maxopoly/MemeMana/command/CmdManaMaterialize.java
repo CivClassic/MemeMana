@@ -30,7 +30,7 @@ public class CmdManaMaterialize extends PlayerCommand {
 		}
 		UUID player = ((Player) sender).getUniqueId();
 		MemeManaPouch pouch = MemeManaPouch.getPouch(MemeManaOwnerManager.fromUUID(player));
-		MemeManaGUI<Long> gui = new MemeManaGUI<Long>(player,() -> pouch.getRawUnits().keySet(),pouch::getDisplayStack,(timestamp,p) -> {
+		MemeManaGUI<Long> gui = new MemeManaGUI<>(player,() -> pouch.getRawUnits().keySet(),pouch::getDisplayStack,(timestamp,p) -> {
 			PlayerInventory pInv = p.getInventory();
 			ItemMap toGiveMap = pouch.getPhysicalMana(timestamp);
 			if (toGiveMap.fitsIn(pInv)) {
@@ -40,7 +40,7 @@ public class CmdManaMaterialize extends PlayerCommand {
 				}else{
 					pouch.adjustSpecificManaUnitByTimestamp(timestamp, manaContent - 1);
 				}
-				toGiveMap.getItemStackRepresentation().forEach(u -> pInv.addItem(u));
+				toGiveMap.getItemStackRepresentation().forEach(pInv::addItem);
 			} else {
 				p.sendMessage(ChatColor.RED + "There is not enough space in your inventory");
 			}
@@ -52,6 +52,6 @@ public class CmdManaMaterialize extends PlayerCommand {
 
 	@Override
 	public List <String> tabComplete(CommandSender sender, String [] args) {
-		return new LinkedList <String> (); //empty list
+		return new LinkedList <> (); //empty list
 	}
 }

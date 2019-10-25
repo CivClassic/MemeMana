@@ -1,6 +1,5 @@
 package com.github.maxopoly.MemeMana;
 
-import com.civclassic.altmanager.AltManager;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;

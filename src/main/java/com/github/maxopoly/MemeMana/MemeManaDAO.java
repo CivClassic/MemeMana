@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -233,7 +234,7 @@ public class MemeManaDAO extends ManagedDatasource {
 	}
 
 	public Map<OwnerType, Map<Integer, Integer>> loadAllManaOwners() {
-		Map<OwnerType,Map<Integer,Integer>> owners = new HashMap<OwnerType,Map<Integer,Integer>>();
+		Map<OwnerType,Map<Integer,Integer>> owners = new EnumMap<>(OwnerType.class);
 		for(OwnerType ty : OwnerType.values()){
 			owners.put(ty,new HashMap<Integer,Integer>());
 		}
@@ -312,7 +313,7 @@ public class MemeManaDAO extends ManagedDatasource {
 				PreparedStatement getManaStats = connection
 						.prepareStatement("select * from manaStats;")) {
 			ResultSet rs = getManaStats.executeQuery();
-			Map<Integer,ManaGainStat> out = new HashMap<Integer,ManaGainStat>();
+			Map<Integer,ManaGainStat> out = new HashMap<>();
 			while(rs.next()) {
 				out.put(rs.getInt(1),new ManaGainStat(rs.getInt(2),rs.getLong(3)));
 			}

@@ -1,6 +1,8 @@
 name: ${project.name}
 main: com.github.maxopoly.MemeMana.MemeManaPlugin
 author: Maxopoly
+authors:
+ - Lazersmoke
 version: ${project.version}
 depend: [CivModCore, AltManager, ExilePearl]
 commands:

@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 public class LoginListener implements Listener {
-	public static final Map<UUID,Long> manaLoginTimes = new HashMap<UUID,Long>();
-	private static final Map<UUID,BukkitTask> notifyTasks = new HashMap<UUID,BukkitTask>();
+	public static final Map<UUID,Long> manaLoginTimes = new HashMap<>();
+	private static final Map<UUID,BukkitTask> notifyTasks = new HashMap<>();
 
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent e) {

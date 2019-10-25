@@ -13,10 +13,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import vg.civcraft.mc.civmodcore.api.ItemAPI;
 import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
 import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
-import vg.civcraft.mc.civmodcore.itemHandling.ISUtils;
 
 public class MemeManaGUI<T> {
 	private static final SimpleDateFormat manaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
@@ -50,10 +51,10 @@ public class MemeManaGUI<T> {
 			currentPage--;
 			showScreen();
 		}
-		if (units.size() == 0) {
+		if (units.isEmpty()) {
 			//item to indicate that there is nothing to claim
 			ItemStack noClaim = new ItemStack(Material.BARRIER);
-			ISUtils.setName(noClaim, ChatColor.GOLD + "Nothing here");
+			ItemAPI.setDisplayName(noClaim, ChatColor.GOLD + "Nothing here");
 			ci.setSlot(new DecorationStack(noClaim), 4);
 		} else {
 			int nextSlot = 0;
@@ -70,7 +71,7 @@ public class MemeManaGUI<T> {
 		// previous button
 		if (currentPage > 0) {
 			ItemStack back = new ItemStack(Material.ARROW);
-			ISUtils.setName(back, ChatColor.GOLD + "Go to previous page");
+			ItemAPI.setDisplayName(back, ChatColor.GOLD + "Go to previous page");
 			Clickable baCl = new Clickable(back) {
 
 				@Override
@@ -86,7 +87,7 @@ public class MemeManaGUI<T> {
 		// next button
 		if ((45 * (currentPage + 1)) <= units.size()) {
 			ItemStack forward = new ItemStack(Material.ARROW);
-			ISUtils.setName(forward, ChatColor.GOLD + "Go to next page");
+			ItemAPI.setDisplayName(forward, ChatColor.GOLD + "Go to next page");
 			Clickable forCl = new Clickable(forward) {
 
 				@Override
@@ -100,8 +101,8 @@ public class MemeManaGUI<T> {
 			ci.setSlot(forCl, 53);
 		}
 		// exit button
-		ItemStack backToOverview = new ItemStack(Material.WOOD_DOOR);
-		ISUtils.setName(backToOverview, ChatColor.GOLD + "Close");
+		ItemStack backToOverview = new ItemStack(Material.OAK_DOOR);
+		ItemAPI.setDisplayName(backToOverview, ChatColor.GOLD + "Close");
 		ci.setSlot(new Clickable(backToOverview) {
 
 			@Override
