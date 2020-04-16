@@ -79,8 +79,12 @@ public class MemeManaDAO extends ManagedDatasource {
 
                 return true;
             }
-        });
-		registerMigration(2, false, new Callable<Boolean> () {
+        },"ALTER TABLE manaOwners MODIFY id int unique", "ALTER TABLE manaOwners DROP PRIMARY KEY;");
+		registerMigration(2,false, "delete from manaOwners where id <> (select min(id) from (select * from manaOwners) as m2 "
+				+ "where m2.foreignId = manaOwners.foreignId and m2.foreignIdType = manaOwners.foreignIdType);",
+				"ALTER TABLE manaOwners ADD PRIMARY KEY(foreignId,foreignIdType)",
+				"ALTER TABLE manaOwners MODIFY id int auto_increment unique");
+		registerMigration(3, false, new Callable<Boolean> () {
 
             @Override
             public Boolean call() throws Exception {

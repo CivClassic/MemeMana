@@ -1,5 +1,6 @@
 name: ${project.name}
 main: com.github.maxopoly.MemeMana.MemeManaPlugin
+api-version: 1.14
 author: Maxopoly
 authors:
  - Lazersmoke
