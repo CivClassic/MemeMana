@@ -79,7 +79,7 @@ public class MemeManaDAO extends ManagedDatasource {
 
                 return true;
             }
-        },"CREATE TABLE alts (groupid bigint(20) NOT NULL, player varchar(40) NOT NULL, PRIMARY KEY (player))",
+        },"CREATE TABLE alts IF NOT EXISTS (groupid bigint(20) NOT NULL, player varchar(40) NOT NULL, PRIMARY KEY (player))",
 				"ALTER TABLE manaOwners MODIFY id int unique", "ALTER TABLE manaOwners DROP PRIMARY KEY;");
 		registerMigration(2,false, "delete from manaOwners where id <> (select min(id) from (select * from manaOwners) as m2 "
 				+ "where m2.foreignId = manaOwners.foreignId and m2.foreignIdType = manaOwners.foreignIdType);",
