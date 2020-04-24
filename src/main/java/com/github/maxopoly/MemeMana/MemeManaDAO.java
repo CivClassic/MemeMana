@@ -115,13 +115,27 @@ public class MemeManaDAO extends ManagedDatasource {
                                 .prepareStatement("create table if not exists manaStats (ownerId int primary key, streak int not null, lastDay bigint not null);")) {
                     ps.execute();
                 }
-                for(UUID uuid : streaks.keySet()) {
+                //Save maximum streak for an alt cluster
+                Map <Integer, UUID> externalIdMapping = new HashMap<>();
+                for(Entry<UUID, Integer> entry : streaks.entrySet()) {
+                	int banStickId = MemeManaOwnerManager.getExternalIDFromBanStick(entry.getKey());
+                	if (externalIdMapping.containsKey(banStickId)) {
+                		int existingStreak = streaks.get(externalIdMapping.get(banStickId));
+                		if (existingStreak < entry.getValue()) {
+                			externalIdMapping.put(banStickId, entry.getKey());
+                		}
+                	}
+                	else {
+                		externalIdMapping.put(banStickId, entry.getKey());
+                	}
+                }
+                for(Entry<Integer,UUID> entry : externalIdMapping.entrySet()) {
                     try (Connection connection = getConnection();
                             PreparedStatement ps = connection
                                     .prepareStatement("insert into manaStats (ownerId, streak, lastDay) values(?,?,?);")) {
-                        ps.setInt(1, MemeManaOwnerManager.getExternalIDFromBanStick(uuid));
-                        ps.setInt(2, streaks.get(uuid));
-                        ps.setLong(3, lastDays.get(uuid));
+                        ps.setInt(1, entry.getKey());
+                        ps.setInt(2, streaks.get(entry.getValue()));
+                        ps.setLong(3, lastDays.get(entry.getValue()));
                         ps.execute();
                     }
                 }
